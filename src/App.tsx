@@ -742,7 +742,7 @@ export default function App() {
 
                       {/* Character card details (Now outside the backing card to render in front of the image) */}
                       <div 
-                        className="absolute bottom-6 inset-x-6 flex flex-col justify-end text-white select-none pointer-events-none z-40"
+                        className="absolute bottom-3 sm:bottom-6 inset-x-3 sm:inset-x-6 flex flex-col justify-end text-white select-none pointer-events-none z-40"
                         style={{
                           transform: role === 'center'
                             ? 'rotateX(calc(var(--tilt-x, 0) * 0.25 * 1deg)) rotateY(calc(var(--tilt-y, 0) * 0.25 * 1deg)) translateZ(15px)'
@@ -752,17 +752,17 @@ export default function App() {
                             : 'transform 40ms linear',
                         }}
                       >
-                        <div className="flex flex-col gap-2 mb-3">
-                          <span className="text-[7px] sm:text-[8px] tracking-[0.2em] font-black bg-white text-black uppercase px-2 py-1 rounded-sm w-fit select-none shadow-sm">
+                        <div className="flex flex-col gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
+                          <span className="text-[6px] sm:text-[8px] tracking-[0.15em] sm:tracking-[0.2em] font-black bg-white text-black uppercase px-1 py-0.5 sm:px-2 sm:py-1 rounded-sm w-fit select-none shadow-sm">
                             {char.tag}
                           </span>
-                          <h3 className="text-xs sm:text-sm font-black tracking-[0.15em] leading-none uppercase px-3 py-2 border-2 border-white rounded-xl w-fit bg-black/40 backdrop-blur-md text-white select-none">
+                          <h3 className="text-[9px] sm:text-sm font-black tracking-[0.1em] sm:tracking-[0.15em] leading-none uppercase px-2 py-1.5 sm:px-3 sm:py-2 border sm:border-2 border-white rounded-lg sm:rounded-xl w-fit bg-black/40 backdrop-blur-md text-white select-none">
                             {char.name}
                           </h3>
                         </div>
                         
-                        {/* Tech Badges representing agency services */}
-                        <div className="flex flex-wrap gap-1.5">
+                        {/* Tech Badges representing agency services (Hidden on mobile to show the character 3D image clearly) */}
+                        <div className="hidden sm:flex flex-wrap gap-1.5">
                           {char.techs.map((tech, i) => (
                             <span key={i} className="text-[8px] sm:text-[9px] font-bold bg-black/45 border border-white/10 rounded-md px-2 py-0.5 backdrop-blur-md text-white/90 uppercase tracking-wider shadow-sm">
                               {tech}
@@ -789,11 +789,11 @@ export default function App() {
               </div>
 
               {/* Bottom-left text + nav buttons */}
-              <div className="absolute bottom-6 left-4 sm:bottom-20 sm:left-24 z-[60] max-w-[320px] sm:max-w-[400px]">
-                <span className="text-[9px] font-extrabold tracking-[0.3em] text-purple-400 uppercase block mb-2">
+              <div className="absolute bottom-4 left-4 sm:bottom-20 sm:left-24 z-[60] max-w-[260px] sm:max-w-[400px]">
+                <span className="text-[8px] sm:text-[9px] font-extrabold tracking-[0.25em] sm:tracking-[0.3em] text-purple-400 uppercase block mb-2">
                   EXCLUSIVIDADE • TECNOLOGIA • ESCALA
                 </span>
-                <p className="text-[11px] sm:text-sm text-white/70 leading-relaxed mb-4 sm:mb-6 font-medium block">
+                <p className="text-[10px] sm:text-sm text-white/70 leading-relaxed mb-3 sm:mb-6 font-medium block">
                   {CHARACTERS[activeIndex].details}
                 </p>
 
@@ -1017,7 +1017,9 @@ export default function App() {
               playsInline
               preload="auto"
               loop
-              className="w-full h-full object-cover object-right lg:object-right-bottom opacity-75 mix-blend-screen"
+              className={`w-full h-full opacity-75 mix-blend-screen ${
+                isMobile ? 'object-contain object-right-bottom' : 'object-cover lg:object-right-bottom'
+              }`}
             />
             {/* Cybernetic Purple & Black Overlay tints */}
             <div className="absolute inset-0 bg-purple-950/15 mix-blend-color z-[1]" />
@@ -1182,10 +1184,10 @@ export default function App() {
               playsInline
               autoPlay
               loop
-              className={`object-cover mix-blend-screen transition-all duration-1000 ${
+              className={`mix-blend-screen transition-all duration-1000 ${
                 isMobile 
-                  ? 'w-[80%] h-[80%] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[40px]' 
-                  : 'w-full h-full'
+                  ? 'w-[80%] h-[80%] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[40px] object-contain' 
+                  : 'w-full h-full object-cover'
               }`}
             />
             {/* Purple tint overlay to make the hand purple! */}
