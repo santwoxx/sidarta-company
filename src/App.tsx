@@ -123,7 +123,10 @@ function MagneticButton({ onClick, direction, label, isActive }: MagneticButtonP
     setPosition({ x: 0, y: 0 });
   };
 
-  const isPortfolio = label === 'Portfólio';
+  const isBlackStyle = 
+    label === 'Portfólio' || 
+    (label === 'Serviços' && direction === 'up') || 
+    (label === 'Contato' && direction === 'down');
 
   return (
     <motion.button
@@ -145,7 +148,7 @@ function MagneticButton({ onClick, direction, label, isActive }: MagneticButtonP
         opacity: { duration: 0.25 }
       }}
       className={`fixed right-6 sm:right-12 z-[60] flex flex-col items-center gap-2.5 cursor-pointer group ${
-        isPortfolio ? 'text-black' : 'text-purple-400 hover:text-white'
+        isBlackStyle ? 'text-black' : 'text-purple-400 hover:text-white'
       }`}
       style={{
         bottom: direction === 'down' ? '1.5rem' : 'auto',
@@ -161,7 +164,7 @@ function MagneticButton({ onClick, direction, label, isActive }: MagneticButtonP
             y: isHovered ? -2 : 0
           }}
           className={`text-[9px] font-black tracking-[0.3em] uppercase transition-colors ${
-            isPortfolio ? 'text-black' : 'text-purple-400 group-hover:text-purple-300'
+            isBlackStyle ? 'text-black' : 'text-purple-400 group-hover:text-purple-300'
           }`}
         >
           {label}
@@ -171,7 +174,7 @@ function MagneticButton({ onClick, direction, label, isActive }: MagneticButtonP
       <div className="relative flex items-center justify-center">
         {/* Outer Ring and Icon */}
         <div className={`w-12 h-12 rounded-full border flex items-center justify-center backdrop-blur-md shadow-lg shadow-black/40 transition-all duration-300 ${
-          isPortfolio 
+          isBlackStyle 
             ? 'bg-white border-white group-hover:bg-neutral-100 group-hover:border-neutral-250' 
             : 'bg-black/50 border-purple-500/20 group-hover:border-purple-400/50'
         }`}>
@@ -181,7 +184,7 @@ function MagneticButton({ onClick, direction, label, isActive }: MagneticButtonP
               transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
             >
               <ArrowDown className={`w-5 h-5 transition-colors ${
-                isPortfolio ? 'text-black' : 'text-purple-300 group-hover:text-white'
+                isBlackStyle ? 'text-black' : 'text-purple-300 group-hover:text-white'
               }`} strokeWidth={2.5} />
             </motion.div>
           ) : (
@@ -190,7 +193,7 @@ function MagneticButton({ onClick, direction, label, isActive }: MagneticButtonP
               transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
             >
               <ArrowUp className={`w-5 h-5 transition-colors ${
-                isPortfolio ? 'text-black' : 'text-purple-300 group-hover:text-white'
+                isBlackStyle ? 'text-black' : 'text-purple-300 group-hover:text-white'
               }`} strokeWidth={2.5} />
             </motion.div>
           )}
@@ -204,7 +207,7 @@ function MagneticButton({ onClick, direction, label, isActive }: MagneticButtonP
             y: isHovered ? 2 : 0
           }}
           className={`text-[9px] font-black tracking-[0.3em] uppercase transition-colors ${
-            isPortfolio ? 'text-black' : 'text-purple-400 group-hover:text-purple-300'
+            isBlackStyle ? 'text-black' : 'text-purple-400 group-hover:text-purple-300'
           }`}
         >
           {label}
