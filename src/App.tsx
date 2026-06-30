@@ -216,8 +216,9 @@ function MagneticButton({ onClick, direction, label, isActive }: MagneticButtonP
 
 export default function App() {
   // Navigation State
-  const [activeSection, setActiveSection] = useState<'hero' | 'portfolio' | 'middle'>('hero');
+  const [activeSection, setActiveSection] = useState<'hero' | 'portfolio' | 'middle' | 'contact'>('hero');
   const [isSectionTransitioning, setIsSectionTransitioning] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
 
   useEffect(() => {
     setIsSectionTransitioning(true);
@@ -227,10 +228,20 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [activeSection]);
 
+  // Trigger Contact Modal after 2 seconds stationary in Contact section
+  useEffect(() => {
+    if (activeSection === 'contact') {
+      const timer = setTimeout(() => {
+        setShowContactModal(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowContactModal(false);
+    }
+  }, [activeSection]);
+
   // Portfolio Modal State
   const [selectedProject, setSelectedProject] = useState<typeof PORTFOLIO_ITEMS[number] | null>(null);
-
-
 
   // Carousel State
   const [activeIndex, setActiveIndex] = useState(0);
@@ -241,6 +252,54 @@ export default function App() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
   const portfolioVideoRef = useRef<HTMLVideoElement>(null);
+  const contactVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Contact Form State
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const messageText = `Olá! Gostaria de receber uma proposta personalizada da Sidarta.\n\n` +
+      `*Nome:* ${formData.name}\n` +
+      `*E-mail:* ${formData.email}\n` +
+      `*WhatsApp:* ${formData.phone}\n\n` +
+      `*Serviços de Interesse:*\n` +
+      (selectedServices.length > 0 
+        ? selectedServices.map(s => `- ${s}`).join('\n') 
+        : 'Nenhum serviço selecionado no checklist (interesse geral)');
+
+    // 1. Send to Backend on Render (if configured)
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    if (backendUrl) {
+      try {
+        await fetch(backendUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            services: selectedServices,
+          }),
+        });
+      } catch (err) {
+        console.error('Failed to submit to backend:', err);
+      }
+    }
+
+    // 2. Redirect to WhatsApp
+    const whatsappUrl = `https://wa.me/5573991422872?text=${encodeURIComponent(messageText)}`;
+    
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+
+    // Open WhatsApp in a new tab
+    window.open(whatsappUrl, '_blank');
+  };
 
   // Preload images and handle resize
   useEffect(() => {
@@ -374,10 +433,6 @@ export default function App() {
     container.style.setProperty('--tilt-y', '0');
   };
 
-
-
-
-
   const navigate = (direction: 'next' | 'prev') => {
     if (isAnimating) return;
     setIsAnimating(true);
@@ -427,7 +482,9 @@ export default function App() {
             ? 'translateY(0)' 
             : activeSection === 'portfolio' 
               ? 'translateY(-100%)' 
-              : 'translateY(-200%)',
+              : activeSection === 'middle'
+                ? 'translateY(-200%)'
+                : 'translateY(-300%)',
           scale: isSectionTransitioning ? 0.94 : 1,
           filter: isSectionTransitioning ? 'blur(1px) brightness(0.85)' : 'blur(0px) brightness(1)',
           transition: 'transform 1100ms cubic-bezier(0.85, 0, 0.15, 1), scale 1100ms cubic-bezier(0.85, 0, 0.15, 1), filter 1100ms cubic-bezier(0.85, 0, 0.15, 1)',
@@ -477,6 +534,14 @@ export default function App() {
                 }`}
               >
                 Serviços
+              </button>
+              <button
+                onClick={() => setActiveSection('contact')}
+                className={`text-[10px] font-semibold transition-colors uppercase tracking-wider cursor-pointer ${
+                  activeSection === 'contact' ? 'text-purple-400' : 'text-white/75 hover:text-white'
+                }`}
+              >
+                Contato
               </button>
             </nav>
 
@@ -1068,6 +1133,166 @@ export default function App() {
             </main>
           </motion.div>
         </div>
+
+        {/* ==================== SECTION 4: CONTACT & PROPOSAL SECTION ==================== */}
+        <div 
+          id="contact"
+          className="relative w-full h-screen shrink-0 bg-[#05020c] border-t border-white/5 flex flex-col justify-start overflow-hidden select-none"
+        >
+          {/* Background Video Component */}
+          <div className="absolute inset-0 pointer-events-none z-0 select-none w-full h-full overflow-hidden">
+            {/* The cybernetic hand video */}
+            <video
+              ref={contactVideoRef}
+              src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"
+              muted
+              playsInline
+              autoPlay
+              loop
+              className={`object-cover mix-blend-screen transition-all duration-1000 ${
+                isMobile 
+                  ? 'w-[80%] h-[80%] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[40px]' 
+                  : 'w-full h-full'
+              }`}
+            />
+            {/* Purple tint overlay to make the hand purple! */}
+            <div className="absolute inset-0 bg-purple-600/25 mix-blend-color pointer-events-none" />
+          </div>
+
+          {/* Cyber Grid Background */}
+          <div className="absolute inset-0 cyber-grid pointer-events-none z-[1] opacity-35" />
+
+          {/* Glassmorphic Proposal Modal */}
+          <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 z-10 overflow-y-auto custom-scrollbar">
+            <AnimatePresence>
+              {showContactModal && (
+                <div className="w-full max-w-lg pointer-events-none flex justify-center">
+                  {!isSubmitted ? (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.93, y: 30 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.93, y: 30 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                      className="w-full bg-[#0a0516]/85 border border-purple-500/35 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-[0_0_50px_rgba(139,92,246,0.2)] flex flex-col gap-6 select-text pointer-events-auto"
+                    >
+                      {/* Modal Header */}
+                      <div>
+                        <span className="text-[9px] font-black text-purple-400 uppercase tracking-widest block mb-1.5">
+                          RECEBER PROPOSTA
+                        </span>
+                        <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">
+                          Proposta Personalizada
+                        </h2>
+                        <p className="text-xs text-white/60 mt-1">
+                          Preencha seus dados para receber o orçamento detalhado dos serviços de seu interesse.
+                        </p>
+                      </div>
+
+                      {/* Selected Services Listing */}
+                      <div className="bg-purple-950/20 border border-purple-500/20 rounded-2xl p-4 flex flex-col gap-2">
+                        <span className="text-[8px] font-bold text-purple-300 uppercase tracking-wider">
+                          Serviços de seu interesse:
+                        </span>
+                        {selectedServices.length > 0 ? (
+                          <div className="flex flex-wrap gap-1.5 mt-1">
+                            {selectedServices.map((service) => (
+                              <span 
+                                key={service} 
+                                className="text-[8px] font-extrabold bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-md px-2 py-0.5 uppercase tracking-wide"
+                              >
+                                {service}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-purple-300/80 italic">
+                            Nenhum serviço selecionado ainda. Elaboraremos uma proposta geral.
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Form Fields */}
+                      <form onSubmit={handleContactSubmit} className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[8px] font-bold text-white/75 uppercase tracking-wider">Nome Completo</label>
+                          <input 
+                            type="text" 
+                            required
+                            placeholder="Seu nome"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder-white/35 focus:outline-none focus:border-purple-500/60 transition-colors"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[8px] font-bold text-white/75 uppercase tracking-wider">E-mail</label>
+                          <input 
+                            type="email" 
+                            required
+                            placeholder="seu@email.com"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder-white/35 focus:outline-none focus:border-purple-500/60 transition-colors"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[8px] font-bold text-white/75 uppercase tracking-wider">WhatsApp / Telefone</label>
+                          <input 
+                            type="tel" 
+                            required
+                            placeholder="(00) 00000-0000"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white placeholder-white/35 focus:outline-none focus:border-purple-500/60 transition-colors"
+                          />
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="w-full mt-2 flex items-center justify-center gap-2 text-xs font-black text-white bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:opacity-50 rounded-xl py-3.5 transition-all shadow-md shadow-purple-955/40 hover:scale-[1.02] active:scale-[0.98] cursor-pointer uppercase tracking-wider text-center"
+                        >
+                          {isSubmitting ? 'Enviando...' : 'Solicitar Proposta →'}
+                        </button>
+                      </form>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.93 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.93 }}
+                      className="w-full bg-[#0a0516]/85 border border-purple-500/35 rounded-3xl p-8 backdrop-blur-xl shadow-[0_0_50px_rgba(139,92,246,0.2)] flex flex-col items-center text-center gap-5 pointer-events-auto"
+                    >
+                      <div className="w-16 h-16 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 text-3xl">
+                        ✓
+                      </div>
+                      <div>
+                        <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">
+                          Proposta Solicitada!
+                        </h2>
+                        <p className="text-xs text-white/70 mt-2 leading-relaxed">
+                          Obrigado, <strong>{formData.name}</strong>! Seus dados foram enviados com sucesso. Entraremos em contato em até 24 horas.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsSubmitted(false);
+                          setFormData({ name: '', email: '', phone: '' });
+                        }}
+                        className="mt-2 text-[10px] font-extrabold text-purple-300 hover:text-white uppercase tracking-wider border border-purple-500/30 hover:border-purple-500 rounded-xl px-6 py-2.5 transition-all cursor-pointer"
+                      >
+                        Voltar
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
 
       {/* Pinned Navigation Arrows (Fixed at the viewport level) */}
@@ -1093,6 +1318,22 @@ export default function App() {
         direction="up"
         label="Portfólio"
         isActive={activeSection === 'middle'}
+      />
+
+      {/* Middle Down Arrow */}
+      <MagneticButton
+        onClick={() => setActiveSection('contact')}
+        direction="down"
+        label="Contato"
+        isActive={activeSection === 'middle'}
+      />
+
+      {/* Contact Up Arrow */}
+      <MagneticButton
+        onClick={() => setActiveSection('middle')}
+        direction="up"
+        label="Serviços"
+        isActive={activeSection === 'contact'}
       />
 
       {/* Portfolio Detail Modal */}
