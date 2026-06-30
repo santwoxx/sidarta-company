@@ -1007,9 +1007,8 @@ export default function App() {
           id="inquire"
           className="relative w-full h-screen shrink-0 bg-[#05020c] border-t border-white/5 overflow-hidden"
         >
-
           {/* Background Video Component with Scrubbing */}
-          <div className="order-last lg:order-none relative lg:absolute lg:inset-0 lg:z-0 overflow-hidden pointer-events-none w-full aspect-square md:aspect-video lg:aspect-auto lg:h-full bg-black/40">
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-black/40">
             <video
               ref={videoRef}
               src="/servicos.mp4"
@@ -1017,9 +1016,7 @@ export default function App() {
               playsInline
               preload="auto"
               loop
-              className={`w-full h-full opacity-75 mix-blend-screen ${
-                isMobile ? 'object-contain object-right-bottom' : 'object-cover lg:object-right-bottom'
-              }`}
+              className="w-full h-full opacity-75 mix-blend-screen object-cover object-right"
             />
             {/* Cybernetic Purple & Black Overlay tints */}
             <div className="absolute inset-0 bg-purple-950/15 mix-blend-color z-[1]" />
