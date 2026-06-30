@@ -249,6 +249,7 @@ export default function App() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: 1200, height: 800 });
 
   // Middle Section State
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -332,7 +333,8 @@ export default function App() {
     });
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 640);
+      setIsMobile(window.innerWidth < 768);
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -631,18 +633,20 @@ export default function App() {
                 {CHARACTERS.map((char, index) => {
                   const role = getRole(index);
 
-                  // Role-based styling calculations
+                  // Role-based styling calculations with height-adaptability
                   let style: React.CSSProperties = {};
+                  const isShortScreen = windowSize.height < 680;
+                  const isTinyScreen = windowSize.height < 550;
 
                   if (role === 'center') {
                     style = {
-                      transform: `translateX(-50%) scale(${isMobile ? 1.25 : 1.5})`,
+                      transform: `translateX(-50%) scale(${isTinyScreen ? 0.9 : isShortScreen ? 1.1 : isMobile ? 1.25 : 1.5})`,
                       filter: 'blur(0px)',
                       opacity: 1,
                       zIndex: 20,
                       left: '50%',
-                      height: isMobile ? '38%' : '58%',
-                      bottom: isMobile ? '34%' : '14%',
+                      height: isTinyScreen ? '26%' : isShortScreen ? '32%' : isMobile ? '38%' : '58%',
+                      bottom: isTinyScreen ? '42%' : isShortScreen ? '38%' : isMobile ? '34%' : '14%',
                     };
                   } else if (role === 'left') {
                     style = {
@@ -651,8 +655,8 @@ export default function App() {
                       opacity: 0.4,
                       zIndex: 10,
                       left: isMobile ? '15%' : '28%',
-                      height: isMobile ? '13%' : '24%',
-                      bottom: isMobile ? '38%' : '22%',
+                      height: isTinyScreen ? '10%' : isShortScreen ? '15%' : isMobile ? '13%' : '24%',
+                      bottom: isTinyScreen ? '45%' : isShortScreen ? '42%' : isMobile ? '38%' : '22%',
                     };
                   } else {
                     // right
@@ -662,8 +666,8 @@ export default function App() {
                       opacity: 0.4,
                       zIndex: 10,
                       left: isMobile ? '85%' : '72%',
-                      height: isMobile ? '13%' : '24%',
-                      bottom: isMobile ? '38%' : '22%',
+                      height: isTinyScreen ? '10%' : isShortScreen ? '15%' : isMobile ? '13%' : '24%',
+                      bottom: isTinyScreen ? '45%' : isShortScreen ? '42%' : isMobile ? '38%' : '22%',
                     };
                   }
 
@@ -1001,7 +1005,7 @@ export default function App() {
         {/* ==================== SECTION 3: INTERACTIVE MIDDLE SECTION ==================== */}
         <div 
           id="inquire"
-          className="relative w-full h-screen shrink-0 bg-[#05020c] border-t border-white/5 flex flex-col justify-center overflow-hidden"
+          className="relative w-full h-screen shrink-0 bg-[#05020c] border-t border-white/5 overflow-hidden"
         >
 
           {/* Background Video Component with Scrubbing */}
@@ -1023,46 +1027,48 @@ export default function App() {
           {/* Cyber Grid Background */}
           <div className="absolute inset-0 cyber-grid pointer-events-none z-[3] opacity-40" />
 
-          {/* Content Layout Container with Parallax Effect */}
-          <motion.div 
-            animate={{
-              y: activeSection === 'middle' ? 0 : 80,
-              opacity: activeSection === 'middle' ? 1 : 0,
-              scale: activeSection === 'middle' ? 1 : 0.96,
-            }}
-            transition={{
-              duration: 1.0,
-              ease: [0.85, 0, 0.15, 1],
-              delay: activeSection === 'middle' ? 0.05 : 0
-            }}
-            className="relative z-10 flex flex-col order-first lg:order-none w-full bg-transparent pb-16 lg:pb-0 lg:min-h-screen justify-center"
-          >
-            <main id="spade-hero" className="w-full max-w-7xl mx-auto px-6 py-20 lg:py-32 flex-1 flex flex-col justify-center">
-              
-              {/* Static Headline in Portuguese */}
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.8 }}
-                className="w-full"
-              >
-                <h1 className="text-3xl md:text-4xl lg:text-[46px] font-black tracking-tight text-white leading-[1.12] mb-6 select-none w-full whitespace-pre-wrap uppercase">
-                  vamos alavancar<br />o seu negócio?
-                </h1>
-              </motion.div>
+          {/* Scrollable Content Container */}
+          <div className="absolute inset-0 overflow-y-auto custom-scrollbar z-10 flex flex-col justify-center">
+            {/* Content Layout Container with Parallax Effect */}
+            <motion.div 
+              animate={{
+                y: activeSection === 'middle' ? 0 : 80,
+                opacity: activeSection === 'middle' ? 1 : 0,
+                scale: activeSection === 'middle' ? 1 : 0.96,
+              }}
+              transition={{
+                duration: 1.0,
+                ease: [0.85, 0, 0.15, 1],
+                delay: activeSection === 'middle' ? 0.05 : 0
+              }}
+              className="relative z-10 flex flex-col order-first lg:order-none w-full bg-transparent py-16 lg:py-0 lg:min-h-screen justify-center"
+            >
+              <main id="spade-hero" className="w-full max-w-7xl mx-auto px-6 py-20 lg:py-32 flex-1 flex flex-col justify-center">
+                
+                {/* Static Headline in Portuguese */}
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.8 }}
+                  className="w-full"
+                >
+                  <h1 className="text-3xl md:text-4xl lg:text-[46px] font-black tracking-tight text-white leading-[1.12] mb-6 select-none w-full whitespace-pre-wrap uppercase">
+                    vamos alavancar<br />o seu negócio?
+                  </h1>
+                </motion.div>
 
-              {/* Secondary Description Text */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.8, delay: 0.15 }}
-              >
-                <p className="text-sm md:text-base text-purple-200/70 leading-relaxed font-normal mb-14 max-w-2xl">
-                  Selecione os serviços de desenvolvimento, automação ou social media que você precisa abaixo e fale diretamente conosco via WhatsApp.
-                </p>
-              </motion.div>
+                {/* Secondary Description Text */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.8, delay: 0.15 }}
+                >
+                  <p className="text-sm md:text-base text-purple-200/70 leading-relaxed font-normal mb-14 max-w-2xl">
+                    Selecione os serviços de desenvolvimento, automação ou social media que você precisa abaixo e fale diretamente conosco via WhatsApp.
+                  </p>
+                </motion.div>
 
               {/* Interactive Multi-Select Service Pills */}
               <motion.div 
@@ -1156,8 +1162,9 @@ export default function App() {
                 </AnimatePresence>
               </motion.div>
 
-            </main>
-          </motion.div>
+              </main>
+            </motion.div>
+          </div>
         </div>
 
         {/* ==================== SECTION 4: CONTACT & PROPOSAL SECTION ==================== */}
