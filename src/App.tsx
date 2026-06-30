@@ -303,11 +303,32 @@ export default function App() {
     window.open(whatsappUrl, '_blank');
   };
 
-  // Preload images and handle resize
+  // Preload images, videos and handle resize
   useEffect(() => {
+    // Preload character images
     CHARACTERS.forEach((char) => {
       const img = new Image();
       img.src = char.src;
+    });
+
+    // Preload portfolio images
+    PORTFOLIO_ITEMS.forEach((item) => {
+      const img = new Image();
+      img.src = item.image;
+    });
+
+    // Preload background videos in background thread
+    const videosToPreload = [
+      '/servicos.mp4',
+      '/portifolio.mp4',
+      'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4'
+    ];
+    videosToPreload.forEach((url) => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'video';
+      link.href = url;
+      document.head.appendChild(link);
     });
 
     const handleResize = () => {
@@ -682,6 +703,7 @@ export default function App() {
                         <img
                           src={char.src}
                           alt={char.name}
+                          decoding="async"
                           className="absolute w-auto max-w-none select-none pointer-events-none"
                           style={{
                             height: isMobile ? '64%' : '74%',
@@ -928,6 +950,8 @@ export default function App() {
                         <img 
                           src={item.image} 
                           alt={item.title}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
