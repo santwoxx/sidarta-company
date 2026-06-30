@@ -227,13 +227,12 @@ export default function App() {
     }, 1100);
     return () => clearTimeout(timer);
   }, [activeSection]);
-
-  // Trigger Contact Modal after 2 seconds stationary in Contact section
+  // Trigger Contact Modal after 4.2 seconds (after the hand rising animation finishes)
   useEffect(() => {
     if (activeSection === 'contact') {
       const timer = setTimeout(() => {
         setShowContactModal(true);
-      }, 2000);
+      }, 4200);
       return () => clearTimeout(timer);
     } else {
       setShowContactModal(false);
