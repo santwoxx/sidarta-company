@@ -1184,11 +1184,7 @@ export default function App() {
               playsInline
               autoPlay
               loop
-              className={`mix-blend-screen transition-all duration-1000 ${
-                isMobile 
-                  ? 'w-[80%] h-[80%] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-[40px] object-contain' 
-                  : 'w-full h-full object-cover'
-              }`}
+              className="w-full h-full object-cover mix-blend-screen transition-all duration-1000"
             />
             {/* Purple tint overlay to make the hand purple! */}
             <div className="absolute inset-0 bg-purple-600/25 mix-blend-color pointer-events-none" />
