@@ -1,0 +1,1205 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Character figurine data tailored for Sidarta Company (Tech & Creative)
+const CHARACTERS = [
+  {
+    id: 'anadev',
+    name: 'Ana Dev',
+    role: 'Software & Automations',
+    src: '/anadev.png.png',
+    bg: '#080312', // Ultra dark purple-black
+    panelGradient: 'linear-gradient(135deg, #6d28d9 0%, #1e1b4b 100%)', // Deep violet to indigo-950
+    tag: 'DEVELOPER & AUTOMATIONS',
+    details: 'Desenvolvimento de softwares sob medida, APIs robustas e automações inteligentes para otimizar processos e acelerar os resultados da sua empresa.',
+    techs: ['</> Software', '🤖 Automações', '🧠 IA & Chatbots']
+  },
+  {
+    id: 'carlosgestor',
+    name: 'Carlos Gestor',
+    role: 'Traffic & Growth',
+    src: '/carlosgestor.png.png',
+    bg: '#020108', // Pitch black
+    panelGradient: 'linear-gradient(135deg, #4338ca 0%, #0f172a 100%)', // Indigo to slate-900
+    tag: 'TRAFFIC & PERFORMANCE',
+    details: 'Estratégias avançadas de tráfego pago, funis de alta conversão e escala de leads qualificados para multiplicar o faturamento do seu negócio.',
+    techs: ['📈 Meta Ads', '🎯 Google Ads', '📊 Funis de Escala']
+  },
+  {
+    id: 'antonydesign',
+    name: 'Antony Design',
+    role: 'Social Media & Branding',
+    src: '/antonydesign.png.png',
+    bg: '#0f0114', // Midnight plum
+    panelGradient: 'linear-gradient(135deg, #be185d 0%, #3b0764 100%)', // Fuchsia to dark purple
+    tag: 'CREATIVE & SOCIAL MEDIA',
+    details: 'Posicionamento de marca, design de alto impacto visual e gestão estratégica de redes sociais para gerar desejo, autoridade e conexão.',
+    techs: ['🎨 Branding', '📱 Redes Sociais', '🎬 Criação de Conteúdo']
+  }
+];
+
+const SERVICES = ["Software", "Automação", "Social Media", "Tráfego Pago"];
+
+const PORTFOLIO_ITEMS = [
+  {
+    id: 'neuralflow',
+    title: 'NeuralFlow AI',
+    category: 'Automação & IA',
+    shortDescription: 'Integração de agentes inteligentes e CRM automatizado, reduzindo o tempo de resposta em 92% e triplicando as conversões.',
+    description: 'Um ecossistema completo de atendimento e vendas automatizado por Inteligência Artificial. Desenvolvemos agentes autônomos integrados diretamente ao CRM da empresa, capazes de qualificar leads, agendar reuniões e fechar vendas em tempo real, operando 24/7 com tom de voz humanizado.',
+    image: '/portfolio-neuralflow.jpg',
+    fallbackGradient: 'from-purple-900 via-purple-950 to-black',
+    techs: ['OpenAI API', 'Node.js', 'n8n', 'PostgreSQL', 'Typebot'],
+    stats: {
+      metric: '92%',
+      label: 'Redução no tempo de resposta'
+    }
+  },
+  {
+    id: 'growthscale',
+    title: 'GrowthScale Hub',
+    category: 'Tráfego & Funis',
+    shortDescription: 'Estruturação de funil de vendas de alta conversão e escala de anúncios que gerou mais de R$ 1.2M em faturamento.',
+    description: 'Estratégia completa de escala de tráfego pago e inteligência de dados. Desenvolvemos funis personalizados de conversão imediata, otimizados com Pixel avançado e tracking de conversões offline, alcançando um ROI histórico para o cliente através de testes rigorosos de criativos e públicos.',
+    image: '/portfolio-growthscale.jpg',
+    fallbackGradient: 'from-indigo-900 via-slate-950 to-black',
+    techs: ['Meta Ads', 'Google Ads', 'Analytics', 'Looker Studio'],
+    stats: {
+      metric: '4.8x',
+      label: 'Retorno sobre investimento (ROAS)'
+    }
+  },
+  {
+    id: 'apexplatform',
+    title: 'Apex Web Platform',
+    category: 'Desenvolvimento Web',
+    shortDescription: 'Plataforma SaaS moderna de alta performance com carregamento instantâneo, design responsivo e segurança de ponta.',
+    description: 'Criação de um sistema web completo (SaaS) com foco em velocidade de carregamento e experiência do usuário impecável. Construída com as tecnologias mais modernas do mercado, a plataforma conta com painel administrativo em tempo real, integrações de pagamento e infraestrutura autoescalável.',
+    image: '/portfolio-apex.jpg',
+    fallbackGradient: 'from-fuchsia-900 via-pink-950 to-black',
+    techs: ['React', 'Vite', 'Tailwind CSS', 'TypeScript', 'Firebase'],
+    stats: {
+      metric: '< 0.8s',
+      label: 'Tempo de carregamento médio'
+    }
+  },
+  {
+    id: 'vanguard',
+    title: 'Vanguard Brand',
+    category: 'Design & Social Media',
+    shortDescription: 'Rebranding completo e posicionamento digital premium que aumentou o engajamento orgânico da marca em 250%.',
+    description: 'Reposicionamento estratégico de marca para o mercado premium. Criamos uma identidade visual marcante, diretrizes de marca consistentes e uma linha editorial de alto impacto para redes sociais, transformando a percepção de valor dos serviços do cliente e gerando desejo imediato.',
+    image: '/portfolio-vanguard.jpg',
+    fallbackGradient: 'from-violet-950 via-purple-900 to-black',
+    techs: ['Branding', 'Motion Design', 'Social Media Strategy', 'Figma'],
+    stats: {
+      metric: '+250%',
+      label: 'Engajamento orgânico'
+    }
+  }
+];
+
+interface MagneticButtonProps {
+  onClick: () => void;
+  direction: 'down' | 'up';
+  label: string;
+  isActive: boolean;
+}
+
+function MagneticButton({ onClick, direction, label, isActive }: MagneticButtonProps) {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - (rect.left + rect.width / 2);
+    const y = e.clientY - (rect.top + rect.height / 2);
+    setPosition({ x: x * 0.35, y: y * 0.35 });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const isPortfolio = label === 'Portfólio';
+
+  return (
+    <motion.button
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      animate={{ 
+        x: position.x, 
+        y: position.y,
+        opacity: isActive ? 1 : 0,
+        scale: isActive ? 1 : 0.8,
+      }}
+      transition={{ 
+        type: "spring", 
+        stiffness: 150, 
+        damping: 15,
+        mass: 0.8,
+        opacity: { duration: 0.25 }
+      }}
+      className={`fixed right-6 sm:right-12 z-[60] flex flex-col items-center gap-2.5 cursor-pointer group ${
+        isPortfolio ? 'text-black' : 'text-purple-400 hover:text-white'
+      }`}
+      style={{
+        bottom: direction === 'down' ? '1.5rem' : 'auto',
+        top: direction === 'up' ? '2.5rem' : 'auto',
+        pointerEvents: isActive ? 'auto' : 'none',
+      }}
+      aria-label={direction === 'down' ? "Scroll down" : "Scroll up"}
+    >
+      {direction === 'up' && (
+        <motion.span 
+          animate={{
+            opacity: isHovered ? 1 : 0.6,
+            y: isHovered ? -2 : 0
+          }}
+          className={`text-[9px] font-black tracking-[0.3em] uppercase transition-colors ${
+            isPortfolio ? 'text-black' : 'text-purple-400 group-hover:text-purple-300'
+          }`}
+        >
+          {label}
+        </motion.span>
+      )}
+      
+      <div className="relative flex items-center justify-center">
+        {/* Outer Ring and Icon */}
+        <div className={`w-12 h-12 rounded-full border flex items-center justify-center backdrop-blur-md shadow-lg shadow-black/40 transition-all duration-300 ${
+          isPortfolio 
+            ? 'bg-white border-white group-hover:bg-neutral-100 group-hover:border-neutral-250' 
+            : 'bg-black/50 border-purple-500/20 group-hover:border-purple-400/50'
+        }`}>
+          {direction === 'down' ? (
+            <motion.div
+              animate={{ y: [0, 4, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            >
+              <ArrowDown className={`w-5 h-5 transition-colors ${
+                isPortfolio ? 'text-black' : 'text-purple-300 group-hover:text-white'
+              }`} strokeWidth={2.5} />
+            </motion.div>
+          ) : (
+            <motion.div
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            >
+              <ArrowUp className={`w-5 h-5 transition-colors ${
+                isPortfolio ? 'text-black' : 'text-purple-300 group-hover:text-white'
+              }`} strokeWidth={2.5} />
+            </motion.div>
+          )}
+        </div>
+      </div>
+
+      {direction === 'down' && (
+        <motion.span 
+          animate={{
+            opacity: isHovered ? 1 : 0.6,
+            y: isHovered ? 2 : 0
+          }}
+          className={`text-[9px] font-black tracking-[0.3em] uppercase transition-colors ${
+            isPortfolio ? 'text-black' : 'text-purple-400 group-hover:text-purple-300'
+          }`}
+        >
+          {label}
+        </motion.span>
+      )}
+    </motion.button>
+  );
+}
+
+export default function App() {
+  // Navigation State
+  const [activeSection, setActiveSection] = useState<'hero' | 'portfolio' | 'middle'>('hero');
+  const [isSectionTransitioning, setIsSectionTransitioning] = useState(false);
+
+  useEffect(() => {
+    setIsSectionTransitioning(true);
+    const timer = setTimeout(() => {
+      setIsSectionTransitioning(false);
+    }, 1100);
+    return () => clearTimeout(timer);
+  }, [activeSection]);
+
+  // Portfolio Modal State
+  const [selectedProject, setSelectedProject] = useState<typeof PORTFOLIO_ITEMS[number] | null>(null);
+
+
+
+  // Carousel State
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Middle Section State
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const portfolioVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Preload images and handle resize
+  useEffect(() => {
+    CHARACTERS.forEach((char) => {
+      const img = new Image();
+      img.src = char.src;
+    });
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Play/Pause Portfolio Logo Video based on activeSection
+  useEffect(() => {
+    const video = portfolioVideoRef.current;
+    if (!video) return;
+
+    if (activeSection === 'portfolio') {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  }, [activeSection]);
+
+  // Background Video Scrubbing Logic
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let targetTime = 0;
+    let isSeeking = false;
+
+    const performSeek = () => {
+      if (video.duration && !isSeeking) {
+        isSeeking = true;
+        video.currentTime = targetTime;
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (window.innerWidth < 1024) return;
+
+      if (video.duration) {
+        // The character's nose is located at roughly 78% of the screen width on desktop
+        const noseX = window.innerWidth * 0.78;
+        let percentage = 0.5;
+
+        if (e.clientX < noseX) {
+          // Left side: map e.clientX [0, noseX] to video percentage [0, 0.5]
+          const leftPercent = e.clientX / noseX;
+          percentage = leftPercent * 0.5;
+        } else {
+          // Right side: map e.clientX [noseX, window.innerWidth] to video percentage [0.5, 1.0]
+          const rightPercent = (e.clientX - noseX) / (window.innerWidth - noseX);
+          percentage = 0.5 + rightPercent * 0.5;
+        }
+        
+        // Clamp between 0 and 1
+        percentage = Math.max(0, Math.min(1, percentage));
+        
+        targetTime = percentage * video.duration;
+        performSeek();
+      }
+    };
+
+    const handleSeeked = () => {
+      isSeeking = false;
+      // If the cursor moved during the seek, catch up immediately
+      if (video.duration && Math.abs(video.currentTime - targetTime) > 0.05) {
+        performSeek();
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    video.addEventListener('seeked', handleSeeked);
+
+    // Keep the video paused on load
+    video.pause();
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      video.removeEventListener('seeked', handleSeeked);
+    };
+  }, []);
+
+  // Mouse Move tracking for 3D character tilt (using CSS Variables for performance)
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const tiltX = -((y - centerY) / centerY) * 14; // Max 14 degrees tilt
+    const tiltY = ((x - centerX) / centerX) * 14;
+    
+    const container = e.currentTarget;
+    container.style.setProperty('--tilt-x', `${tiltX}`);
+    container.style.setProperty('--tilt-y', `${tiltY}`);
+  };
+
+  const handleHeroMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    container.style.setProperty('--tilt-x', '0');
+    container.style.setProperty('--tilt-y', '0');
+  };
+
+  const handlePortfolioMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const tiltX = -((y - centerY) / centerY) * 15; // Max 15 degrees tilt
+    const tiltY = ((x - centerX) / centerX) * 15;
+    
+    const container = e.currentTarget;
+    container.style.setProperty('--tilt-x', `${tiltX}`);
+    container.style.setProperty('--tilt-y', `${tiltY}`);
+  };
+
+  const handlePortfolioMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    container.style.setProperty('--tilt-x', '0');
+    container.style.setProperty('--tilt-y', '0');
+  };
+
+
+
+
+
+  const navigate = (direction: 'next' | 'prev') => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+
+    setActiveIndex((prev) => {
+      if (direction === 'next') {
+        return (prev + 1) % 3;
+      } else {
+        return (prev + 2) % 3;
+      }
+    });
+
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 650);
+  };
+
+  const toggleService = (service: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(service)
+        ? prev.filter((s) => s !== service)
+        : [...prev, service]
+    );
+  };
+
+  // Get index positions for 3-way rotation
+  const getRole = (index: number) => {
+    if (index === activeIndex) return 'center';
+    if (index === (activeIndex + 2) % 3) return 'left';
+    return 'right'; // (activeIndex + 1) % 3
+  };
+
+  return (
+    <div
+      className="relative w-full h-screen overflow-hidden bg-black text-white selection:bg-purple-900/50 selection:text-purple-200 antialiased"
+      style={{
+        fontFamily: "'Inter', sans-serif",
+        perspective: '1200px',
+        perspectiveOrigin: '50% 50%',
+      }}
+    >
+      {/* Slider Container */}
+      <div
+        className="w-full h-full flex flex-col"
+        style={{
+          transform: activeSection === 'hero' 
+            ? 'translateY(0)' 
+            : activeSection === 'portfolio' 
+              ? 'translateY(-100%)' 
+              : 'translateY(-200%)',
+          scale: isSectionTransitioning ? 0.94 : 1,
+          filter: isSectionTransitioning ? 'blur(1px) brightness(0.85)' : 'blur(0px) brightness(1)',
+          transition: 'transform 1100ms cubic-bezier(0.85, 0, 0.15, 1), scale 1100ms cubic-bezier(0.85, 0, 0.15, 1), filter 1100ms cubic-bezier(0.85, 0, 0.15, 1)',
+          transformStyle: 'preserve-3d',
+        }}
+      >
+        {/* ==================== SECTION 1: HEADER & HERO CAROUSEL ==================== */}
+        <div
+          onMouseMove={handleHeroMouseMove}
+          onMouseLeave={handleHeroMouseLeave}
+          className="relative w-full h-screen shrink-0 overflow-hidden select-none transition-colors duration-[650ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+          style={{
+            backgroundColor: CHARACTERS[activeIndex].bg,
+          }}
+        >
+          {/* Navigation Header */}
+          <header className="absolute top-0 inset-x-0 h-24 z-[70] flex items-center justify-between px-6 sm:px-12 bg-gradient-to-b from-black/50 to-transparent backdrop-blur-[1px]">
+            {/* Brand Logo */}
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-black uppercase tracking-[0.25em] text-white leading-none">
+                SIDARTA
+              </span>
+            </div>
+
+            {/* Center Nav Links (Hidden on mobile) */}
+            <nav className="hidden md:flex items-center gap-8 bg-white/5 border border-white/10 rounded-full px-6 py-2 backdrop-blur-md">
+              <button
+                onClick={() => setActiveSection('hero')}
+                className={`text-[10px] font-semibold transition-colors uppercase tracking-wider cursor-pointer ${
+                  activeSection === 'hero' ? 'text-purple-400' : 'text-white/75 hover:text-white'
+                }`}
+              >
+                Início
+              </button>
+              <button
+                onClick={() => setActiveSection('portfolio')}
+                className={`text-[10px] font-semibold transition-colors uppercase tracking-wider cursor-pointer ${
+                  activeSection === 'portfolio' ? 'text-purple-400' : 'text-white/75 hover:text-white'
+                }`}
+              >
+                Portfólio
+              </button>
+              <button
+                onClick={() => setActiveSection('middle')}
+                className={`text-[10px] font-semibold transition-colors uppercase tracking-wider cursor-pointer ${
+                  activeSection === 'middle' ? 'text-purple-400' : 'text-white/75 hover:text-white'
+                }`}
+              >
+                Serviços
+              </button>
+            </nav>
+
+            {/* Right Spacer (Balanced) */}
+            <div className="flex items-center gap-4 w-10 sm:w-auto"></div>
+          </header>
+
+          {/* 1. Grain overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none z-50 opacity-35 mix-blend-overlay"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E")`,
+              backgroundSize: '200px 200px',
+              backgroundRepeat: 'repeat',
+            }}
+          />
+
+          {/* Cyber Grid Background */}
+          <div className="absolute inset-0 cyber-grid pointer-events-none z-[2]" />
+
+          {/* Dynamic Aurora Glow */}
+          <div
+            className="absolute left-1/2 top-1/2 w-[600px] h-[600px] rounded-full aurora-glow pointer-events-none z-[1] transition-colors duration-[650ms]"
+            style={{
+              background: `radial-gradient(circle, ${CHARACTERS[activeIndex].id === 'anadev' ? 'rgba(124,58,237,0.2)' : CHARACTERS[activeIndex].id === 'carlosgestor' ? 'rgba(79,70,229,0.2)' : 'rgba(236,72,153,0.2)'} 0%, transparent 70%)`,
+            }}
+          />
+
+          {/* Hero Foreground Content with Parallax Effect */}
+          <motion.div
+            animate={{
+              y: activeSection === 'hero' ? 0 : -80,
+              opacity: activeSection === 'hero' ? 1 : 0,
+              scale: activeSection === 'hero' ? 1 : 0.96,
+            }}
+            transition={{
+              duration: 1.0,
+              ease: [0.85, 0, 0.15, 1],
+            }}
+            className="absolute inset-0 z-10 w-full h-full pointer-events-none"
+          >
+            <div className="w-full h-full relative pointer-events-auto">
+              {/* 2. Giant ghost text "SIDARTA" */}
+              <div
+                className="absolute inset-x-0 flex items-center justify-center pointer-events-none select-none z-[2]"
+                style={{
+                  top: '18%',
+                  fontFamily: "'Anton', sans-serif",
+                  fontSize: 'clamp(90px, 28vw, 380px)',
+                  fontWeight: 900,
+                  color: 'rgba(255, 255, 255, 0.08)',
+                  lineHeight: 1,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  whiteSpace: 'nowrap',
+                  textShadow: '0 0 40px rgba(0,0,0,0.15)',
+                }}
+              >
+                SIDARTA
+              </div>
+
+              {/* Carousel */}
+              <div className="absolute inset-0 z-[3] flex items-center justify-center animate-container">
+                {CHARACTERS.map((char, index) => {
+                  const role = getRole(index);
+
+                  // Role-based styling calculations
+                  let style: React.CSSProperties = {};
+
+                  if (role === 'center') {
+                    style = {
+                      transform: `translateX(-50%) scale(${isMobile ? 1.25 : 1.5})`,
+                      filter: 'blur(0px)',
+                      opacity: 1,
+                      zIndex: 20,
+                      left: '50%',
+                      height: isMobile ? '38%' : '58%',
+                      bottom: isMobile ? '34%' : '14%',
+                    };
+                  } else if (role === 'left') {
+                    style = {
+                      transform: 'translateX(-50%) scale(0.95)',
+                      filter: 'blur(2px)',
+                      opacity: 0.4,
+                      zIndex: 10,
+                      left: isMobile ? '15%' : '28%',
+                      height: isMobile ? '13%' : '24%',
+                      bottom: isMobile ? '38%' : '22%',
+                    };
+                  } else {
+                    // right
+                    style = {
+                      transform: 'translateX(-50%) scale(0.95)',
+                      filter: 'blur(2px)',
+                      opacity: 0.4,
+                      zIndex: 10,
+                      left: isMobile ? '85%' : '72%',
+                      height: isMobile ? '13%' : '24%',
+                      bottom: isMobile ? '38%' : '22%',
+                    };
+                  }
+
+                  return (
+                    <div
+                      key={char.id}
+                      className="absolute aspect-[0.6/1] transition-all duration-[650ms] ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform-filter-opacity flex flex-col justify-end"
+                      style={{
+                        ...style,
+                        transformStyle: 'preserve-3d',
+                        perspective: '1000px',
+                      }}
+                    >
+                      {/* Figurine backing card (Panel) */}
+                      <div
+                        className="absolute inset-x-0 bottom-0 top-[18%] rounded-[28px] border border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden"
+                        style={{
+                          background: char.panelGradient,
+                          transform: role === 'center'
+                            ? 'rotateX(calc(var(--tilt-x, 0) * 0.35 * 1deg)) rotateY(calc(var(--tilt-y, 0) * 0.35 * 1deg))'
+                            : 'none',
+                          transition: isAnimating
+                            ? 'transform 650ms cubic-bezier(0.4, 0, 0.2, 1), background 650ms'
+                            : 'transform 40ms linear, background 650ms',
+                        }}
+                      >
+                        {/* Glowing ambient light inside the box */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-white/5" />
+                        <div className="absolute -inset-20 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_60%)] pointer-events-none" />
+                        
+                        {/* Scanline overlay for cybernetic tech box feel */}
+                        <div className="absolute inset-0 scanline opacity-20 pointer-events-none" />
+                      </div>
+
+                      {/* Character Image (pops out of the backing card for 3D effect) */}
+                      <div className="absolute inset-0 z-20 pointer-events-none overflow-visible">
+                        <img
+                          src={char.src}
+                          alt={char.name}
+                          className="absolute w-auto max-w-none select-none pointer-events-none"
+                          style={{
+                            height: isMobile ? '64%' : '74%',
+                            left: role === 'center'
+                              ? (isMobile ? '55%' : '58%')
+                              : (isMobile ? '58%' : '60%'),
+                            bottom: role === 'center' ? '8%' : '12%',
+                            transform: role === 'center'
+                              ? 'translateX(-50%) scale(1.1) rotateX(calc(var(--tilt-x, 0) * 0.75 * 1deg)) rotateY(calc(var(--tilt-y, 0) * 0.75 * 1deg)) translateZ(45px)'
+                              : 'translateX(-50%) scale(0.95)',
+                            transformOrigin: role === 'center' ? '50% 40%' : 'center',
+                            transition: isAnimating
+                              ? 'transform 650ms cubic-bezier(0.4, 0, 0.2, 1), filter 650ms, opacity 650ms, left 650ms'
+                              : 'transform 40ms linear, filter 650ms, opacity 650ms, left 650ms',
+                            filter: role === 'center'
+                              ? 'drop-shadow(0 25px 35px rgba(0,0,0,0.65))'
+                              : 'drop-shadow(0 10px 15px rgba(0,0,0,0.4)) blur(1px)',
+                          }}
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            const wrapper = target.parentElement;
+                            if (wrapper) {
+                              wrapper.style.display = 'none';
+                            }
+                            const fallback = wrapper?.nextElementSibling as HTMLDivElement;
+                            if (fallback) {
+                              fallback.style.display = 'flex';
+                            }
+                          }}
+                        />
+                      </div>
+
+                      {/* Character card details (Now outside the backing card to render in front of the image) */}
+                      <div 
+                        className="absolute bottom-6 inset-x-6 flex flex-col justify-end text-white select-none pointer-events-none z-40"
+                        style={{
+                          transform: role === 'center'
+                            ? 'rotateX(calc(var(--tilt-x, 0) * 0.25 * 1deg)) rotateY(calc(var(--tilt-y, 0) * 0.25 * 1deg)) translateZ(15px)'
+                            : 'none',
+                          transition: isAnimating
+                            ? 'transform 650ms cubic-bezier(0.4, 0, 0.2, 1)'
+                            : 'transform 40ms linear',
+                        }}
+                      >
+                        <div className="flex flex-col gap-2 mb-3">
+                          <span className="text-[7px] sm:text-[8px] tracking-[0.2em] font-black bg-white text-black uppercase px-2 py-1 rounded-sm w-fit select-none shadow-sm">
+                            {char.tag}
+                          </span>
+                          <h3 className="text-xs sm:text-sm font-black tracking-[0.15em] leading-none uppercase px-3 py-2 border-2 border-white rounded-xl w-fit bg-black/40 backdrop-blur-md text-white select-none">
+                            {char.name}
+                          </h3>
+                        </div>
+                        
+                        {/* Tech Badges representing agency services */}
+                        <div className="flex flex-wrap gap-1.5">
+                          {char.techs.map((tech, i) => (
+                            <span key={i} className="text-[8px] sm:text-[9px] font-bold bg-black/45 border border-white/10 rounded-md px-2 py-0.5 backdrop-blur-md text-white/90 uppercase tracking-wider shadow-sm">
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Fallback avatar box in case the local image is not found yet */}
+                      <div
+                        className="hidden absolute inset-x-0 bottom-0 top-[18%] z-20 flex-col items-center justify-center text-center p-4 bg-purple-950/90 backdrop-blur rounded-[28px] border border-dashed border-purple-500/50"
+                        style={{ display: 'none' }}
+                      >
+                        <span className="text-sm font-bold text-purple-300">
+                          [ Adicione {char.src} ]
+                        </span>
+                        <span className="text-[10px] text-purple-400 mt-2 max-w-[150px]">
+                          Coloque esta imagem na pasta do site para ver o personagem 3D.
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Bottom-left text + nav buttons */}
+              <div className="absolute bottom-6 left-4 sm:bottom-20 sm:left-24 z-[60] max-w-[320px] sm:max-w-[400px]">
+                <span className="text-[9px] font-extrabold tracking-[0.3em] text-purple-400 uppercase block mb-2">
+                  EXCLUSIVIDADE • TECNOLOGIA • ESCALA
+                </span>
+                <p className="text-[11px] sm:text-sm text-white/70 leading-relaxed mb-4 sm:mb-6 font-medium block">
+                  {CHARACTERS[activeIndex].details}
+                </p>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => navigate('prev')}
+                    disabled={isAnimating}
+                    className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center rounded-full border-2 border-white/15 hover:border-white text-white transition-all duration-200 hover:scale-105 hover:bg-white/10 active:scale-95 disabled:opacity-50 cursor-pointer"
+                    aria-label="Previous character"
+                  >
+                    <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.25} />
+                  </button>
+                  <button
+                    onClick={() => navigate('next')}
+                    disabled={isAnimating}
+                    className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center rounded-full border-2 border-white/15 hover:border-white text-white transition-all duration-200 hover:scale-105 hover:bg-white/10 active:scale-95 disabled:opacity-50 cursor-pointer"
+                    aria-label="Next character"
+                  >
+                    <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.25} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Bottom-right link "EXPLORAR PORTFÓLIO" */}
+              <div className="absolute bottom-6 right-4 sm:bottom-20 sm:right-16 z-[60]">
+                <button
+                  onClick={() => setActiveSection('portfolio')}
+                  className="group flex items-center gap-3 text-white transition-all duration-200 hover:opacity-100 cursor-pointer"
+                  style={{ opacity: 0.9 }}
+                >
+                  <span
+                    className="font-normal uppercase tracking-tight leading-none"
+                    style={{
+                      fontFamily: "'Anton', sans-serif",
+                      fontSize: 'clamp(24px, 4vw, 56px)',
+                    }}
+                  >
+                    EXPLORAR PORTFÓLIO
+                  </span>
+                  <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-purple-500/25 group-hover:bg-purple-500/40 flex items-center justify-center transition-colors duration-200 border border-purple-500/30">
+                    <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-white transform group-hover:translate-x-1 transition-transform" strokeWidth={2.25} />
+                  </div>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* ==================== SECTION 2: PORTFOLIO SECTION ==================== */}
+        <div 
+          id="portfolio"
+          onMouseMove={handlePortfolioMouseMove}
+          onMouseLeave={handlePortfolioMouseLeave}
+          className="relative w-full h-screen shrink-0 bg-[#05020c] border-t border-white/5 overflow-hidden select-none"
+        >
+
+          {/* Dynamic Aurora Glow for Portfolio */}
+          <div className="absolute left-1/4 top-1/3 w-[500px] h-[500px] rounded-full aurora-glow pointer-events-none z-[1]" 
+               style={{
+                 background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)'
+               }}
+          />
+          {/* Purple ambient glow behind grid */}
+          <div className="absolute right-1/4 top-1/4 w-[500px] h-[500px] rounded-full pointer-events-none z-0" 
+               style={{
+                 background: 'radial-gradient(circle, rgba(79,70,229,0.1) 0%, transparent 70%)'
+               }}
+          />
+
+          {/* Cyber Grid Background */}
+          <div className="absolute inset-0 cyber-grid pointer-events-none z-[2] opacity-50" />
+
+          {/* Large Background Logo Animation Video (Full-Screen Behind scrollable content) */}
+          <div 
+            className="absolute inset-0 pointer-events-none z-0 select-none w-full h-full overflow-hidden"
+            style={{
+              opacity: 0.7,
+            }}
+          >
+            <video
+              ref={portfolioVideoRef}
+              src="/portifolio.mp4"
+              muted
+              playsInline
+              loop
+              className="w-full h-full object-cover mix-blend-screen"
+            />
+          </div>
+
+          {/* Scrollable Content Container */}
+          <div className="absolute inset-0 overflow-y-auto custom-scrollbar z-10">
+            <motion.div
+              animate={{
+                y: activeSection === 'portfolio' ? 0 : 80,
+                opacity: activeSection === 'portfolio' ? 1 : 0,
+                scale: activeSection === 'portfolio' ? 1 : 0.96,
+              }}
+              transition={{
+                duration: 1.0,
+                ease: [0.85, 0, 0.15, 1],
+                delay: activeSection === 'portfolio' ? 0.05 : 0
+              }}
+              className="relative z-10 w-full max-w-7xl mx-auto px-6 py-24 md:py-28 flex flex-col justify-start"
+            >
+              {/* Header */}
+              <div className="mb-10 md:mb-14">
+                <div 
+                  className={`flex items-center gap-2 mb-3 transition-all duration-1000 ${
+                    activeSection === 'portfolio' ? 'animate-fade-in-up' : 'opacity-0'
+                  }`}
+                  style={{ animationDelay: '0.1s', animationFillMode: 'forwards' }}
+                >
+                  <div className="w-8 h-px bg-purple-500/50" />
+                  <span className="text-[10px] font-bold text-purple-400 uppercase tracking-[0.3em]">
+                    Nossos Cases
+                  </span>
+                </div>
+                <h2 
+                  className={`text-3xl md:text-5xl lg:text-6xl font-black tracking-tight text-white uppercase mb-4 transition-all duration-1000 ${
+                    activeSection === 'portfolio' ? 'animate-fade-in-up' : 'opacity-0'
+                  }`}
+                  style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}
+                >
+                  PROJETOS EM <span className="gradient-text-animated font-normal italic font-serif">destaque</span>
+                </h2>
+                <p 
+                  className={`text-xs sm:text-sm text-purple-200/60 max-w-xl transition-all duration-1000 ${
+                    activeSection === 'portfolio' ? 'animate-fade-in-up' : 'opacity-0'
+                  }`}
+                  style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}
+                >
+                  Uma seleção de soluções de alta performance desenvolvidas sob medida, unindo design de ponta e engenharia de software para gerar resultados reais.
+                </p>
+              </div>
+
+              {/* Bento Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 w-full pb-10">
+                {PORTFOLIO_ITEMS.map((item, index) => {
+                  // Column spans alternate: 7/5/5/7
+                  const colSpan = index === 0 || index === 3 ? 'md:col-span-7' : 'md:col-span-5';
+                  return (
+                    <motion.div
+                      key={item.id}
+                      onClick={() => setSelectedProject(item)}
+                      whileHover={{ y: -6 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className={`${colSpan} group relative h-[260px] md:h-[320px] rounded-3xl overflow-hidden border border-white/10 bg-black/40 cursor-pointer flex flex-col justify-end p-6 select-none shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all duration-1000 ${
+                        activeSection === 'portfolio' ? 'animate-fade-in-up' : 'opacity-0'
+                      }`}
+                      style={{ 
+                        animationDelay: activeSection === 'portfolio' ? `${0.4 + index * 0.15}s` : '0s',
+                        animationFillMode: 'forwards'
+                      }}
+                    >
+                      {/* Background Image & Fallback Gradient */}
+                      <div className="absolute inset-0 z-0">
+                        <div className={`absolute inset-0 bg-gradient-to-br ${item.fallbackGradient} opacity-40 group-hover:opacity-60 transition-opacity duration-500`} />
+                        <img 
+                          src={item.image} 
+                          alt={item.title}
+                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                        {/* Halftone Dot Overlay */}
+                        <div 
+                          className="absolute inset-0 opacity-15 mix-blend-multiply pointer-events-none"
+                          style={{
+                            backgroundImage: 'radial-gradient(circle, #000 1.5px, transparent 1.5px)',
+                            backgroundSize: '8px 8px'
+                          }}
+                        />
+                        {/* Dark vignettes */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                        {/* Interactive hover glow */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-tr from-purple-600/10 via-transparent to-indigo-600/5 transition-opacity duration-500" />
+                      </div>
+
+                      {/* Card Content */}
+                      <div className="relative z-10">
+                        <span className="text-[9px] font-bold bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-md px-2 py-1 uppercase tracking-wider inline-block mb-3">
+                          {item.category}
+                        </span>
+                        <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-1">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs text-white/70 font-medium line-clamp-2 max-w-md">
+                          {item.shortDescription}
+                        </p>
+                      </div>
+
+                      {/* Hover Pill "Ver Case" */}
+                      <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-20">
+                        <div className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-black/80 border border-purple-500/40 backdrop-blur-md text-[10px] font-black text-purple-300 uppercase tracking-wider">
+                          Ver Case <span className="text-xs">↗</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* ==================== SECTION 3: INTERACTIVE MIDDLE SECTION ==================== */}
+        <div 
+          id="inquire"
+          className="relative w-full h-screen shrink-0 bg-[#05020c] border-t border-white/5 flex flex-col justify-center overflow-hidden"
+        >
+
+          {/* Background Video Component with Scrubbing */}
+          <div className="order-last lg:order-none relative lg:absolute lg:inset-0 lg:z-0 overflow-hidden pointer-events-none w-full aspect-square md:aspect-video lg:aspect-auto lg:h-full bg-black/40">
+            <video
+              ref={videoRef}
+              src="/servicos.mp4"
+              muted
+              playsInline
+              preload="auto"
+              loop
+              className="w-full h-full object-cover object-right lg:object-right-bottom opacity-75 mix-blend-screen"
+            />
+            {/* Cybernetic Purple & Black Overlay tints */}
+            <div className="absolute inset-0 bg-purple-950/15 mix-blend-color z-[1]" />
+            <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#05020c] via-[#05020c]/90 to-transparent z-[2]" />
+          </div>
+
+          {/* Cyber Grid Background */}
+          <div className="absolute inset-0 cyber-grid pointer-events-none z-[3] opacity-40" />
+
+          {/* Content Layout Container with Parallax Effect */}
+          <motion.div 
+            animate={{
+              y: activeSection === 'middle' ? 0 : 80,
+              opacity: activeSection === 'middle' ? 1 : 0,
+              scale: activeSection === 'middle' ? 1 : 0.96,
+            }}
+            transition={{
+              duration: 1.0,
+              ease: [0.85, 0, 0.15, 1],
+              delay: activeSection === 'middle' ? 0.05 : 0
+            }}
+            className="relative z-10 flex flex-col order-first lg:order-none w-full bg-transparent pb-16 lg:pb-0 lg:min-h-screen justify-center"
+          >
+            <main id="spade-hero" className="w-full max-w-7xl mx-auto px-6 py-20 lg:py-32 flex-1 flex flex-col justify-center">
+              
+              {/* Static Headline in Portuguese */}
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.8 }}
+                className="w-full"
+              >
+                <h1 className="text-3xl md:text-4xl lg:text-[46px] font-black tracking-tight text-white leading-[1.12] mb-6 select-none w-full whitespace-pre-wrap uppercase">
+                  vamos alavancar<br />o seu negócio?
+                </h1>
+              </motion.div>
+
+              {/* Secondary Description Text */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.8, delay: 0.15 }}
+              >
+                <p className="text-sm md:text-base text-purple-200/70 leading-relaxed font-normal mb-14 max-w-2xl">
+                  Selecione os serviços de desenvolvimento, automação ou social media que você precisa abaixo e fale diretamente conosco via WhatsApp.
+                </p>
+              </motion.div>
+
+              {/* Interactive Multi-Select Service Pills */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="mb-12 max-w-3xl"
+              >
+                <h2 className="text-lg sm:text-xl font-extrabold tracking-wider text-purple-300 uppercase mb-2">
+                  Qual serviço você procura?
+                </h2>
+                <p className="text-xs text-purple-400/80 mb-8 uppercase tracking-widest">
+                  Selecione tudo o que se aplica à sua empresa
+                </p>
+
+                <div className="flex flex-wrap gap-3">
+                  {SERVICES.map((service) => {
+                    const isActive = selectedServices.includes(service);
+                    return (
+                      <motion.button
+                        key={service}
+                        onClick={() => toggleService(service)}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer uppercase tracking-wider ${
+                          isActive
+                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/40 border border-purple-500'
+                            : 'bg-transparent text-purple-300 border border-purple-500/25 hover:bg-purple-500/10'
+                        }`}
+                      >
+                        {isActive && (
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                          >
+                            ✓
+                          </motion.span>
+                        )}
+                        {service}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+
+              {/* Contingent Feedback Status Banner */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="max-w-xl h-24"
+              >
+                <AnimatePresence mode="wait">
+                  {selectedServices.length === 0 ? (
+                    <motion.p
+                      key="empty"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.5 }}
+                      exit={{ opacity: 0 }}
+                      className="text-xs sm:text-sm italic text-purple-400/60"
+                    >
+                      * Por favor, selecione uma ou mais especialidades acima para prosseguir.
+                    </motion.p>
+                  ) : (
+                    <motion.div
+                      key="banner"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-purple-950/20 border border-purple-500/20 rounded-2xl backdrop-blur-md">
+                        <span className="text-xs sm:text-sm text-purple-200">
+                          Pronto para falar sobre: <strong className="text-purple-400">{selectedServices.join(", ")}</strong>
+                        </span>
+                        <a
+                          href={`https://wa.me/5573991422872?text=Olá! Gostaria de fazer um orçamento sobre: ${selectedServices.join(", ")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-[10px] font-black text-white bg-purple-600 hover:bg-purple-500 rounded-full px-5 py-2.5 transition-all shadow-md shadow-purple-900/20 hover:scale-105 active:scale-95 cursor-pointer uppercase tracking-wider"
+                        >
+                          Vamos Iniciar →
+                        </a>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+            </main>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Pinned Navigation Arrows (Fixed at the viewport level) */}
+      {/* Portfolio Up Arrow */}
+      <MagneticButton
+        onClick={() => setActiveSection('hero')}
+        direction="up"
+        label="Início"
+        isActive={activeSection === 'portfolio'}
+      />
+
+      {/* Portfolio Down Arrow */}
+      <MagneticButton
+        onClick={() => setActiveSection('middle')}
+        direction="down"
+        label="Serviços"
+        isActive={activeSection === 'portfolio'}
+      />
+
+      {/* Middle Up Arrow */}
+      <MagneticButton
+        onClick={() => setActiveSection('portfolio')}
+        direction="up"
+        label="Portfólio"
+        isActive={activeSection === 'middle'}
+      />
+
+      {/* Portfolio Detail Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-10 select-none">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedProject(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+
+            {/* Modal Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="relative w-full max-w-4xl bg-[#0a0516]/95 border border-purple-500/20 rounded-[32px] overflow-hidden shadow-[0_0_50px_rgba(139,92,246,0.15)] flex flex-col md:flex-row z-10 max-h-[90vh] md:max-h-[80vh] overflow-y-auto custom-scrollbar"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedProject(null)}
+                className="absolute top-6 right-6 z-50 w-10 h-10 rounded-full bg-black/40 border border-white/10 hover:border-purple-500/50 text-white hover:text-purple-300 flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Left Column: Image & Metric */}
+              <div className="w-full md:w-1/2 relative min-h-[200px] md:min-h-full bg-black flex flex-col justify-end">
+                <div className={`absolute inset-0 bg-gradient-to-br ${selectedProject.fallbackGradient} opacity-30`} />
+                <img
+                  src={selectedProject.image}
+                  alt={selectedProject.title}
+                  className="absolute inset-0 w-full h-full object-cover opacity-80"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                
+                {/* Metric Badge */}
+                <div className="relative z-10 p-8 sm:p-10">
+                  <div className="inline-flex flex-col bg-purple-950/80 border border-purple-500/30 backdrop-blur-md rounded-2xl p-4 shadow-lg">
+                    <span className="text-3xl sm:text-4xl font-black text-purple-300 leading-none">
+                      {selectedProject.stats.metric}
+                    </span>
+                    <span className="text-[9px] font-bold text-white/75 uppercase tracking-wider mt-1">
+                      {selectedProject.stats.label}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Details */}
+              <div className="w-full md:w-1/2 p-8 sm:p-10 flex flex-col justify-between bg-gradient-to-b from-transparent to-black/20">
+                <div className="flex-1">
+                  <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest block mb-2">
+                    {selectedProject.category}
+                  </span>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mb-6">
+                    {selectedProject.title}
+                  </h3>
+
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="text-xs font-bold text-purple-300/80 uppercase tracking-wider mb-2">Sobre o Projeto</h4>
+                      <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
+                        {selectedProject.description}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-bold text-purple-300/80 uppercase tracking-wider mb-3">Tecnologias</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.techs.map((tech) => (
+                          <span
+                            key={tech}
+                            className="text-[9px] sm:text-[10px] font-bold bg-purple-950/40 border border-purple-500/20 text-purple-300 rounded-md px-2.5 py-1 uppercase tracking-wider"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA Action */}
+                <div className="mt-8 pt-6 border-t border-white/5">
+                  <a
+                    href={`https://wa.me/5573991422872?text=Olá! Vi o case de sucesso "${selectedProject.title}" no portfólio da Sidarta e gostaria de solicitar um orçamento para um projeto semelhante.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 text-xs font-black text-white bg-purple-600 hover:bg-purple-500 rounded-full py-3.5 transition-all shadow-md shadow-purple-900/20 hover:scale-[1.02] active:scale-[0.98] cursor-pointer uppercase tracking-wider text-center"
+                  >
+                    Fazer Orçamento Semelhante →
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
