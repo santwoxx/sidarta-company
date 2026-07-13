@@ -71,65 +71,6 @@ const FEATURED_PROJECT: PortfolioItem = {
   liveUrl: 'https://central-autocar-site.vercel.app/'
 };
 
-const PORTFOLIO_ITEMS: PortfolioItem[] = [
-  {
-    id: 'neuralflow',
-    title: 'NeuralFlow AI',
-    category: 'Automação & IA',
-    shortDescription: 'Integração de agentes inteligentes e CRM automatizado, reduzindo o tempo de resposta em 92% e triplicando as conversões.',
-    description: 'Um ecossistema completo de atendimento e vendas automatizado por Inteligência Artificial. Desenvolvemos agentes autônomos integrados diretamente ao CRM da empresa, capazes de qualificar leads, agendar reuniões e fechar vendas em tempo real, operando 24/7 com tom de voz humanizado.',
-    image: '/portfolio-neuralflow.jpg',
-    fallbackGradient: 'from-purple-900 via-purple-950 to-black',
-    techs: ['OpenAI API', 'Node.js', 'n8n', 'PostgreSQL', 'Typebot'],
-    stats: {
-      metric: '92%',
-      label: 'Redução no tempo de resposta'
-    }
-  },
-  {
-    id: 'growthscale',
-    title: 'GrowthScale Hub',
-    category: 'Tráfego & Funis',
-    shortDescription: 'Estruturação de funil de vendas de alta conversão e escala de anúncios que gerou mais de R$ 1.2M em faturamento.',
-    description: 'Estratégia completa de escala de tráfego pago e inteligência de dados. Desenvolvemos funis personalizados de conversão imediata, otimizados com Pixel avançado e tracking de conversões offline, alcançando um ROI histórico para o cliente através de testes rigorosos de criativos e públicos.',
-    image: '/portfolio-growthscale.jpg',
-    fallbackGradient: 'from-indigo-900 via-slate-950 to-black',
-    techs: ['Meta Ads', 'Google Ads', 'Analytics', 'Looker Studio'],
-    stats: {
-      metric: '4.8x',
-      label: 'Retorno sobre investimento (ROAS)'
-    }
-  },
-  {
-    id: 'apexplatform',
-    title: 'Apex Web Platform',
-    category: 'Desenvolvimento Web',
-    shortDescription: 'Plataforma SaaS moderna de alta performance com carregamento instantâneo, design responsivo e segurança de ponta.',
-    description: 'Criação de um sistema web completo (SaaS) com foco em velocidade de carregamento e experiência do usuário impecável. Construída com as tecnologias mais modernas do mercado, a plataforma conta com painel administrativo em tempo real, integrações de pagamento e infraestrutura autoescalável.',
-    image: '/portfolio-apex.jpg',
-    fallbackGradient: 'from-fuchsia-900 via-pink-950 to-black',
-    techs: ['React', 'Vite', 'Tailwind CSS', 'TypeScript', 'Firebase'],
-    stats: {
-      metric: '< 0.8s',
-      label: 'Tempo de carregamento médio'
-    }
-  },
-  {
-    id: 'vanguard',
-    title: 'Vanguard Brand',
-    category: 'Design & Social Media',
-    shortDescription: 'Rebranding completo e posicionamento digital premium que aumentou o engajamento orgânico da marca em 250%.',
-    description: 'Reposicionamento estratégico de marca para o mercado premium. Criamos uma identidade visual marcante, diretrizes de marca consistentes e uma linha editorial de alto impacto para redes sociais, transformando a percepção de valor dos serviços do cliente e gerando desejo imediato.',
-    image: '/portfolio-vanguard.jpg',
-    fallbackGradient: 'from-violet-950 via-purple-900 to-black',
-    techs: ['Branding', 'Motion Design', 'Social Media Strategy', 'Figma'],
-    stats: {
-      metric: '+250%',
-      label: 'Engajamento orgânico'
-    }
-  }
-];
-
 interface MagneticButtonProps {
   onClick: () => void;
   direction: 'down' | 'up';
@@ -284,7 +225,6 @@ export default function App() {
   // Middle Section State
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const portfolioVideoRef = useRef<HTMLVideoElement>(null);
   const contactVideoRef = useRef<HTMLVideoElement>(null);
 
   // Inner scroll containers (wheel navigation only switches section at their edges)
@@ -426,7 +366,6 @@ export default function App() {
     // Preload background videos in background thread
     const videosToPreload = [
       '/servicos.mp4',
-      '/portifolio.mp4',
       'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4'
     ];
     videosToPreload.forEach((url) => {
@@ -445,19 +384,6 @@ export default function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // Play/Pause Portfolio Logo Video based on activeSection
-  useEffect(() => {
-    const video = portfolioVideoRef.current;
-    if (!video) return;
-
-    if (activeSection === 'portfolio') {
-      video.currentTime = 0;
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-    }
-  }, [activeSection]);
 
   // Background Video Scrubbing Logic
   useEffect(() => {
@@ -955,37 +881,61 @@ export default function App() {
           className="relative w-full h-screen shrink-0 bg-[#05020c] border-t border-white/5 overflow-hidden select-none"
         >
 
-          {/* Dynamic Aurora Glow for Portfolio */}
-          <div className="absolute left-1/4 top-1/3 w-[500px] h-[500px] rounded-full aurora-glow pointer-events-none z-[1]" 
-               style={{
-                 background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)'
-               }}
-          />
-          {/* Purple ambient glow behind grid */}
-          <div className="absolute right-1/4 top-1/4 w-[500px] h-[500px] rounded-full pointer-events-none z-0" 
-               style={{
-                 background: 'radial-gradient(circle, rgba(79,70,229,0.1) 0%, transparent 70%)'
-               }}
-          />
-
-          {/* Cyber Grid Background */}
-          <div className="absolute inset-0 cyber-grid pointer-events-none z-[2] opacity-50" />
-
-          {/* Large Background Logo Animation Video (Full-Screen Behind scrollable content) */}
-          <div 
-            className="absolute inset-0 pointer-events-none z-0 select-none w-full h-full overflow-hidden"
-            style={{
-              opacity: 0.7,
-            }}
-          >
-            <video
-              ref={portfolioVideoRef}
-              src="/portifolio.mp4"
-              muted
-              playsInline
-              loop
-              className="w-full h-full object-cover mix-blend-screen"
+          {/* ===== Space / Universe Backdrop (purple & black) ===== */}
+          <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
+            {/* Deep-space color wash */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  'radial-gradient(ellipse 120% 90% at 50% 0%, rgba(46,16,101,0.35) 0%, rgba(5,2,12,0) 55%), radial-gradient(ellipse 100% 70% at 82% 100%, rgba(30,27,75,0.40) 0%, rgba(5,2,12,0) 60%)',
+              }}
             />
+
+            {/* Parallax star layers, each twinkling and drifting at its own rhythm */}
+            <div className="space-stars" />
+            <div className="space-stars space-stars-2" />
+            <div className="space-stars space-stars-3" />
+
+            {/* Drifting nebulas */}
+            <div
+              className="nebula"
+              style={{
+                top: '-12%',
+                left: '-10%',
+                width: '58vw',
+                height: '58vw',
+                background: 'radial-gradient(circle, rgba(124,58,237,0.30) 0%, rgba(88,28,135,0.12) 45%, transparent 70%)',
+                animation: 'nebula-drift-a 28s ease-in-out infinite',
+              }}
+            />
+            <div
+              className="nebula"
+              style={{
+                bottom: '-20%',
+                right: '-12%',
+                width: '62vw',
+                height: '62vw',
+                background: 'radial-gradient(circle, rgba(99,102,241,0.22) 0%, rgba(49,46,129,0.10) 45%, transparent 70%)',
+                animation: 'nebula-drift-b 34s ease-in-out infinite',
+              }}
+            />
+            <div
+              className="nebula"
+              style={{
+                top: '28%',
+                left: '52%',
+                width: '34vw',
+                height: '34vw',
+                background: 'radial-gradient(circle, rgba(217,70,239,0.14) 0%, transparent 65%)',
+                animation: 'nebula-drift-a 40s ease-in-out infinite 9s',
+              }}
+            />
+
+            {/* Shooting stars */}
+            <div className="shooting-star" style={{ top: '14%', right: '8%', animationDelay: '2.5s' }} />
+            <div className="shooting-star" style={{ top: '42%', right: '30%', animationDelay: '8s', animationDuration: '14s' }} />
+            <div className="shooting-star" style={{ top: '68%', right: '15%', animationDelay: '13s', animationDuration: '17s' }} />
           </div>
 
           {/* Scrollable Content Container */}
@@ -1159,80 +1109,6 @@ export default function App() {
                 <div className="featured-glow" />
               </div>
 
-              {/* Bento Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 w-full pb-10">
-                {PORTFOLIO_ITEMS.map((item, index) => {
-                  // Column spans alternate: 7/5/5/7
-                  const colSpan = index === 0 || index === 3 ? 'md:col-span-7' : 'md:col-span-5';
-                  return (
-                    <div
-                      key={item.id}
-                      className={`${colSpan} ${
-                        activeSection === 'portfolio' ? 'animate-fade-in-up' : 'opacity-0'
-                      }`}
-                      style={{
-                        animationDelay: activeSection === 'portfolio' ? `${0.5 + index * 0.12}s` : '0s',
-                        animationFillMode: 'forwards',
-                        perspective: '1200px'
-                      }}
-                    >
-                    <motion.div
-                      onClick={() => setSelectedProject(item)}
-                      whileHover={{ y: -10, rotateX: 4, rotateY: -3, scale: 1.015 }}
-                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                      className="group relative h-[260px] md:h-[320px] rounded-3xl overflow-hidden border border-white/10 hover:border-purple-500/40 bg-black/40 cursor-pointer flex flex-col justify-end p-6 select-none shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_35px_70px_-15px_rgba(0,0,0,0.85),0_0_40px_rgba(139,92,246,0.15)] transition-[border-color,box-shadow] duration-500"
-                    >
-                      {/* Background Image & Fallback Gradient */}
-                      <div className="absolute inset-0 z-0">
-                        <div className={`absolute inset-0 bg-gradient-to-br ${item.fallbackGradient} opacity-40 group-hover:opacity-60 transition-opacity duration-500`} />
-                        <img 
-                          src={item.image} 
-                          alt={item.title}
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 opacity-80 group-hover:opacity-100"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                        {/* Halftone Dot Overlay */}
-                        <div 
-                          className="absolute inset-0 opacity-15 mix-blend-multiply pointer-events-none"
-                          style={{
-                            backgroundImage: 'radial-gradient(circle, #000 1.5px, transparent 1.5px)',
-                            backgroundSize: '8px 8px'
-                          }}
-                        />
-                        {/* Dark vignettes */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-                        {/* Interactive hover glow */}
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-tr from-purple-600/10 via-transparent to-indigo-600/5 transition-opacity duration-500" />
-                      </div>
-
-                      {/* Card Content */}
-                      <div className="relative z-10">
-                        <span className="text-[9px] font-bold bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-md px-2 py-1 uppercase tracking-wider inline-block mb-3">
-                          {item.category}
-                        </span>
-                        <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-1">
-                          {item.title}
-                        </h3>
-                        <p className="text-xs text-white/70 font-medium line-clamp-2 max-w-md">
-                          {item.shortDescription}
-                        </p>
-                      </div>
-
-                      {/* Hover Pill "Ver Case" */}
-                      <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-20">
-                        <div className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-black/80 border border-purple-500/40 backdrop-blur-md text-[10px] font-black text-purple-300 uppercase tracking-wider">
-                          Ver Case <span className="text-xs">↗</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                    </div>
-                  );
-                })}
-              </div>
             </motion.div>
           </div>
         </div>

@@ -118,6 +118,104 @@ html {
   animation: gradient-shift 4s ease infinite;
 }
 
+/* ===== Space / Universe backdrop (Portfolio) — purple & black ===== */
+
+/* Tiled star fields; three layers with different densities, drift speeds and twinkle rhythms */
+.space-stars {
+  position: absolute;
+  inset: -60px 0 0 0;
+  background-repeat: repeat;
+  background-image:
+    radial-gradient(1px 1px at 22px 34px, rgba(255, 255, 255, 0.85) 50%, transparent 100%),
+    radial-gradient(1px 1px at 118px 156px, rgba(216, 180, 254, 0.65) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 196px 74px, rgba(255, 255, 255, 0.55) 50%, transparent 100%),
+    radial-gradient(1px 1px at 64px 220px, rgba(196, 181, 253, 0.5) 50%, transparent 100%),
+    radial-gradient(1px 1px at 254px 190px, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+  background-size: 290px 290px;
+  animation: star-twinkle 6s ease-in-out infinite, star-drift 90s linear infinite alternate;
+  will-change: transform, opacity;
+}
+
+.space-stars-2 {
+  background-image:
+    radial-gradient(1px 1px at 48px 96px, rgba(255, 255, 255, 0.55) 50%, transparent 100%),
+    radial-gradient(2px 2px at 168px 44px, rgba(233, 213, 255, 0.7) 50%, transparent 100%),
+    radial-gradient(1px 1px at 300px 200px, rgba(255, 255, 255, 0.4) 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 240px 320px, rgba(192, 132, 252, 0.55) 50%, transparent 100%);
+  background-size: 400px 400px;
+  animation-duration: 8s, 130s;
+  animation-delay: 1.5s, 0s;
+}
+
+.space-stars-3 {
+  background-image:
+    radial-gradient(2.5px 2.5px at 120px 120px, rgba(255, 255, 255, 0.9) 40%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 340px 260px, rgba(192, 132, 252, 0.75) 50%, transparent 100%),
+    radial-gradient(2px 2px at 480px 80px, rgba(255, 255, 255, 0.5) 50%, transparent 100%),
+    radial-gradient(2px 2px at 220px 440px, rgba(165, 180, 252, 0.6) 50%, transparent 100%);
+  background-size: 580px 580px;
+  animation-duration: 11s, 180s;
+  animation-delay: 3s, 0s;
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+@keyframes star-drift {
+  from { transform: translateY(0); }
+  to { transform: translateY(50px); }
+}
+
+/* Soft nebulas drifting through the void (sized/positioned inline per instance) */
+.nebula {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  will-change: transform;
+}
+
+@keyframes nebula-drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, -45px) scale(1.15); }
+}
+
+@keyframes nebula-drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1.08); }
+  50% { transform: translate(-70px, 50px) scale(0.94); }
+}
+
+/* Occasional shooting stars streaking down-left */
+.shooting-star {
+  position: absolute;
+  width: 150px;
+  height: 1.5px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(192, 132, 252, 0.5), transparent);
+  box-shadow: 0 0 6px rgba(216, 180, 254, 0.6);
+  opacity: 0;
+  transform: rotate(215deg);
+  animation: shooting 11s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes shooting {
+  0%, 76% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(215deg);
+  }
+  78% {
+    opacity: 1;
+  }
+  86%, 100% {
+    opacity: 0;
+    transform: translate3d(-420px, 300px, 0) rotate(215deg);
+  }
+}
+
 /* ===== Featured live-preview (Portfolio) — 3D float & glow ===== */
 
 /* Slow levitation of the whole browser frame */
@@ -220,7 +318,10 @@ html {
   .animate-levitate,
   .float-badge,
   .featured-glow,
-  .shine-layer {
+  .shine-layer,
+  .space-stars,
+  .nebula,
+  .shooting-star {
     animation: none !important;
   }
   .site-preview-scroll {
