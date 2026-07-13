@@ -287,6 +287,83 @@ export default function App() {
   const portfolioVideoRef = useRef<HTMLVideoElement>(null);
   const contactVideoRef = useRef<HTMLVideoElement>(null);
 
+  // Inner scroll containers (wheel navigation only switches section at their edges)
+  const portfolioScrollRef = useRef<HTMLDivElement>(null);
+  const middleScrollRef = useRef<HTMLDivElement>(null);
+  const contactScrollRef = useRef<HTMLDivElement>(null);
+
+  // Latest values readable from the wheel handler (registered once)
+  const activeSectionRef = useRef(activeSection);
+  activeSectionRef.current = activeSection;
+  const selectedProjectRef = useRef(selectedProject);
+  selectedProjectRef.current = selectedProject;
+
+  // Mouse wheel navigation between sections
+  useEffect(() => {
+    const SECTION_ORDER = ['hero', 'portfolio', 'middle', 'contact'] as const;
+    const scrollEls: Partial<Record<(typeof SECTION_ORDER)[number], React.RefObject<HTMLDivElement | null>>> = {
+      portfolio: portfolioScrollRef,
+      middle: middleScrollRef,
+      contact: contactScrollRef,
+    };
+
+    let lockedUntil = 0;   // ignore events while the slide transition plays
+    let needsQuiet = false; // after a switch/inner scroll, require a pause so trackpad momentum doesn't chain-skip
+    let accum = 0;
+    let lastEvent = 0;
+
+    const handleWheel = (e: WheelEvent) => {
+      // The case-study modal scrolls internally — don't navigate behind it
+      if (selectedProjectRef.current) return;
+      // Vertical intent only
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+
+      const now = performance.now();
+      const gap = now - lastEvent;
+      lastEvent = now;
+
+      if (now < lockedUntil) {
+        needsQuiet = true;
+        return;
+      }
+      if (needsQuiet) {
+        if (gap < 300) return;
+        needsQuiet = false;
+      }
+      if (gap > 300) accum = 0;
+
+      const section = activeSectionRef.current;
+      const dir = e.deltaY > 0 ? 1 : -1;
+
+      // If the current section scrolls internally, let it scroll and only
+      // navigate once the user is at the relevant edge.
+      const el = scrollEls[section]?.current;
+      if (el && el.scrollHeight > el.clientHeight + 2) {
+        const atTop = el.scrollTop <= 2;
+        const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+        if ((dir > 0 && !atBottom) || (dir < 0 && !atTop)) {
+          accum = 0;
+          needsQuiet = true; // reaching the edge requires a fresh gesture to switch
+          return;
+        }
+      }
+
+      accum += e.deltaY;
+      if (Math.abs(accum) < 50) return;
+      accum = 0;
+
+      const nextIndex = SECTION_ORDER.indexOf(section) + dir;
+      if (nextIndex < 0 || nextIndex >= SECTION_ORDER.length) return;
+
+      lockedUntil = now + 1300; // slide transition lasts 1100ms
+      needsQuiet = true;
+      setActiveSection(SECTION_ORDER[nextIndex]);
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, []);
+
   // Contact Form State
   const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -912,7 +989,7 @@ export default function App() {
           </div>
 
           {/* Scrollable Content Container */}
-          <div className="absolute inset-0 overflow-y-auto custom-scrollbar z-10">
+          <div ref={portfolioScrollRef} className="absolute inset-0 overflow-y-auto custom-scrollbar z-10">
             <motion.div
               animate={{
                 y: activeSection === 'portfolio' ? 0 : 80,
@@ -1185,7 +1262,7 @@ export default function App() {
           <div className="absolute inset-0 cyber-grid pointer-events-none z-[3] opacity-40" />
 
           {/* Scrollable Content Container */}
-          <div className="absolute inset-0 overflow-y-auto custom-scrollbar z-10 flex flex-col justify-center">
+          <div ref={middleScrollRef} className="absolute inset-0 overflow-y-auto custom-scrollbar z-10 flex flex-col justify-center">
             {/* Content Layout Container with Parallax Effect */}
             <motion.div 
               animate={{
@@ -1349,7 +1426,7 @@ export default function App() {
           <div className="absolute inset-0 cyber-grid pointer-events-none z-[1] opacity-35" />
 
           {/* Glassmorphic Proposal Modal */}
-          <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 z-10 overflow-y-auto custom-scrollbar">
+          <div ref={contactScrollRef} className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 z-10 overflow-y-auto custom-scrollbar">
             <AnimatePresence>
               {showContactModal && (
                 <div className="w-full max-w-lg pointer-events-none flex justify-center">
