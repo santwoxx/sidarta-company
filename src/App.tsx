@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp, X, ExternalLink, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Character figurine data tailored for Sidarta Company (Tech & Creative)
@@ -41,7 +41,37 @@ const CHARACTERS = [
 
 const SERVICES = ["Software", "Automação", "Social Media", "Tráfego Pago"];
 
-const PORTFOLIO_ITEMS = [
+interface PortfolioItem {
+  id: string;
+  title: string;
+  category: string;
+  shortDescription: string;
+  description: string;
+  image: string;
+  fallbackGradient: string;
+  techs: string[];
+  stats: { metric: string; label: string };
+  liveUrl?: string;
+}
+
+// Real client project featured with a live preview at the top of the Portfolio section
+const FEATURED_PROJECT: PortfolioItem = {
+  id: 'centralautocar',
+  title: 'Central AutoCar',
+  category: 'Cliente • Site Institucional',
+  shortDescription: 'Site institucional de alta conversão para o centro automotivo referência em Itabuna/BA — com agendamento direto via WhatsApp e SEO local.',
+  description: 'Site institucional desenvolvido para a Central AutoCar, centro automotivo com 4 filiais na Bahia. O projeto apresenta a vitrine completa de serviços (alinhamento 3D, mecânica geral e pneus), unidades, depoimentos e FAQ, com funil de agendamento direto via WhatsApp, carregamento instantâneo e SEO local otimizado para dominar as buscas da região.',
+  image: '/central-autocar-preview.jpg',
+  fallbackGradient: 'from-blue-900 via-slate-950 to-black',
+  techs: ['React', 'Vite', 'Tailwind CSS', 'Vercel', 'SEO Local'],
+  stats: {
+    metric: '5.0 ★',
+    label: 'Avaliação dos clientes no Google'
+  },
+  liveUrl: 'https://central-autocar-site.vercel.app/'
+};
+
+const PORTFOLIO_ITEMS: PortfolioItem[] = [
   {
     id: 'neuralflow',
     title: 'NeuralFlow AI',
@@ -243,7 +273,7 @@ export default function App() {
   }, [activeSection]);
 
   // Portfolio Modal State
-  const [selectedProject, setSelectedProject] = useState<typeof PORTFOLIO_ITEMS[number] | null>(null);
+  const [selectedProject, setSelectedProject] = useState<PortfolioItem | null>(null);
 
   // Carousel State
   const [activeIndex, setActiveIndex] = useState(0);
@@ -312,11 +342,9 @@ export default function App() {
       img.src = char.src;
     });
 
-    // Preload portfolio images
-    PORTFOLIO_ITEMS.forEach((item) => {
-      const img = new Image();
-      img.src = item.image;
-    });
+    // Preload the featured client preview so the Portfolio section opens instantly
+    const previewImg = new Image();
+    previewImg.src = FEATURED_PROJECT.image;
 
     // Preload background videos in background thread
     const videosToPreload = [
@@ -929,24 +957,153 @@ export default function App() {
                 </p>
               </div>
 
+              {/* ===== Featured Client: Live 3D Floating Preview ===== */}
+              {/* "group" lives on this static wrapper (not the 3D-transformed frame) so hover hit-testing stays reliable */}
+              <div
+                className={`group relative mb-14 md:mb-20 ${
+                  activeSection === 'portfolio' ? 'animate-fade-in-up' : 'opacity-0'
+                }`}
+                style={{
+                  animationDelay: '0.35s',
+                  animationFillMode: 'forwards',
+                  perspective: '1600px'
+                }}
+              >
+                {/* Sub-label */}
+                <div className="flex items-center gap-2.5 mb-5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                  </span>
+                  <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-[0.3em]">
+                    Cliente em destaque — Projeto no ar
+                  </span>
+                </div>
+
+                <div className="animate-levitate relative" style={{ transformStyle: 'preserve-3d' }}>
+                  {/* Floating 3D badges (orbit the frame with depth) */}
+                  <div
+                    className="absolute -top-4 right-6 md:-top-5 md:right-12 z-30 float-badge pointer-events-none"
+                    style={{ '--z': '90px', animationDelay: '0.4s' } as React.CSSProperties}
+                  >
+                    <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-black/80 border border-amber-400/40 backdrop-blur-md shadow-[0_12px_35px_rgba(251,191,36,0.2)]">
+                      <span className="text-amber-300 text-xs leading-none">★</span>
+                      <span className="text-[9px] font-black text-amber-200 uppercase tracking-widest">5.0 no Google</span>
+                    </div>
+                  </div>
+                  <div
+                    className="hidden sm:block absolute -bottom-4 left-8 md:left-14 z-30 float-badge pointer-events-none"
+                    style={{ '--z': '70px', animationDelay: '1.6s' } as React.CSSProperties}
+                  >
+                    <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-black/80 border border-purple-400/40 backdrop-blur-md shadow-[0_12px_35px_rgba(139,92,246,0.25)]">
+                      <span className="text-[9px] font-black text-purple-200 uppercase tracking-widest">Desenvolvido pela Sidarta</span>
+                    </div>
+                  </div>
+
+                  {/* 3D tilting browser frame (follows the section mouse tilt) */}
+                  <div
+                    onClick={() => setSelectedProject(FEATURED_PROJECT)}
+                    className="relative rounded-[22px] md:rounded-[28px] border border-purple-500/25 bg-[#0a0516]/90 overflow-hidden cursor-pointer shadow-[0_45px_90px_-25px_rgba(0,0,0,0.9),0_0_60px_rgba(139,92,246,0.12)]"
+                    style={{
+                      transform: 'rotateX(calc(var(--tilt-x, 0) * 0.3 * 1deg)) rotateY(calc(var(--tilt-y, 0) * 0.3 * 1deg))',
+                      transition: 'transform 60ms linear, box-shadow 500ms'
+                    }}
+                  >
+                    {/* Browser chrome bar */}
+                    <div className="relative z-10 flex items-center gap-3 px-4 sm:px-5 py-3 bg-black/85 border-b border-white/10 backdrop-blur-md">
+                      <div className="flex gap-1.5 shrink-0">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+                      </div>
+                      <div className="flex-1 flex justify-center min-w-0">
+                        <div className="flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 max-w-[420px] w-full min-w-0">
+                          <Lock className="w-2.5 h-2.5 text-emerald-400 shrink-0" strokeWidth={3} />
+                          <span className="text-[9px] sm:text-[10px] text-white/70 font-semibold tracking-wide truncate">
+                            central-autocar-site.vercel.app
+                          </span>
+                        </div>
+                      </div>
+                      <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                        </span>
+                        <span className="text-[8px] font-black text-emerald-300 uppercase tracking-widest">Ao vivo</span>
+                      </div>
+                    </div>
+
+                    {/* Site viewport — full-page capture that auto-scrolls on hover */}
+                    <div className="relative h-[300px] sm:h-[380px] md:h-[460px] bg-[#0b1220] overflow-hidden [--frame-h:300px] sm:[--frame-h:380px] md:[--frame-h:460px]">
+                      <img
+                        src={FEATURED_PROJECT.image}
+                        alt="Prévia do site Central AutoCar"
+                        decoding="async"
+                        draggable={false}
+                        className="site-preview-scroll w-full h-auto select-none pointer-events-none"
+                      />
+
+                      {/* Diagonal shine sweep on hover */}
+                      <div className="shine-layer z-10" />
+
+                      {/* Bottom info & CTAs (always visible on mobile, revealed on hover on desktop) */}
+                      <div className="absolute inset-x-0 bottom-0 z-20 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 bg-gradient-to-t from-black/85 via-black/40 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:translate-y-3 sm:group-hover:translate-y-0 transition-all duration-500">
+                        <div className="min-w-0">
+                          <span className="text-[9px] font-bold bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 rounded-md px-2 py-1 uppercase tracking-wider inline-block mb-2.5">
+                            {FEATURED_PROJECT.category}
+                          </span>
+                          <h3 className="text-xl md:text-3xl font-black text-white uppercase tracking-tight mb-1">
+                            {FEATURED_PROJECT.title}
+                          </h3>
+                          <p className="text-xs text-white/70 font-medium max-w-md line-clamp-2">
+                            {FEATURED_PROJECT.shortDescription}
+                          </p>
+                        </div>
+                        <div className="flex gap-3 shrink-0">
+                          <span className="hidden md:flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-black/70 border border-purple-500/40 backdrop-blur-md text-[10px] font-black text-purple-300 uppercase tracking-wider">
+                            Ver Case ↗
+                          </span>
+                          <a
+                            href={FEATURED_PROJECT.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-600 hover:bg-purple-500 text-[10px] font-black text-white uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-900/40"
+                          >
+                            Visitar Site <ExternalLink className="w-3 h-3" strokeWidth={3} />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Levitation glow underneath the floating frame */}
+                <div className="featured-glow" />
+              </div>
+
               {/* Bento Grid */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6 w-full pb-10">
                 {PORTFOLIO_ITEMS.map((item, index) => {
                   // Column spans alternate: 7/5/5/7
                   const colSpan = index === 0 || index === 3 ? 'md:col-span-7' : 'md:col-span-5';
                   return (
-                    <motion.div
+                    <div
                       key={item.id}
-                      onClick={() => setSelectedProject(item)}
-                      whileHover={{ y: -6 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      className={`${colSpan} group relative h-[260px] md:h-[320px] rounded-3xl overflow-hidden border border-white/10 bg-black/40 cursor-pointer flex flex-col justify-end p-6 select-none shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all duration-1000 ${
+                      className={`${colSpan} ${
                         activeSection === 'portfolio' ? 'animate-fade-in-up' : 'opacity-0'
                       }`}
-                      style={{ 
-                        animationDelay: activeSection === 'portfolio' ? `${0.4 + index * 0.15}s` : '0s',
-                        animationFillMode: 'forwards'
+                      style={{
+                        animationDelay: activeSection === 'portfolio' ? `${0.5 + index * 0.12}s` : '0s',
+                        animationFillMode: 'forwards',
+                        perspective: '1200px'
                       }}
+                    >
+                    <motion.div
+                      onClick={() => setSelectedProject(item)}
+                      whileHover={{ y: -10, rotateX: 4, rotateY: -3, scale: 1.015 }}
+                      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                      className="group relative h-[260px] md:h-[320px] rounded-3xl overflow-hidden border border-white/10 hover:border-purple-500/40 bg-black/40 cursor-pointer flex flex-col justify-end p-6 select-none shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:shadow-[0_35px_70px_-15px_rgba(0,0,0,0.85),0_0_40px_rgba(139,92,246,0.15)] transition-[border-color,box-shadow] duration-500"
                     >
                       {/* Background Image & Fallback Gradient */}
                       <div className="absolute inset-0 z-0">
@@ -995,6 +1152,7 @@ export default function App() {
                         </div>
                       </div>
                     </motion.div>
+                    </div>
                   );
                 })}
               </div>
@@ -1393,7 +1551,53 @@ export default function App() {
                 <X className="w-5 h-5" />
               </button>
 
-              {/* Left Column: Image & Metric */}
+              {/* Left Column: Live Preview (client sites) or Image & Metric */}
+              {selectedProject.liveUrl ? (
+                <div className="w-full md:w-1/2 relative min-h-[340px] md:min-h-full bg-[#0b1220] flex flex-col">
+                  {/* Mini browser chrome */}
+                  <div className="flex items-center gap-2.5 px-4 py-2.5 bg-black/80 border-b border-white/10 shrink-0">
+                    <div className="flex gap-1.5 shrink-0">
+                      <span className="w-2 h-2 rounded-full bg-[#ff5f57]" />
+                      <span className="w-2 h-2 rounded-full bg-[#febc2e]" />
+                      <span className="w-2 h-2 rounded-full bg-[#28c840]" />
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1 min-w-0">
+                      <Lock className="w-2 h-2 text-emerald-400 shrink-0" strokeWidth={3} />
+                      <span className="text-[8px] text-white/60 font-semibold truncate">
+                        {selectedProject.liveUrl.replace('https://', '').replace(/\/$/, '')}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Scrollable full-page capture of the client site */}
+                  <div className="flex-1 min-h-[240px] overflow-y-auto custom-scrollbar bg-[#0b1220]">
+                    <img
+                      src={selectedProject.image}
+                      alt={`Prévia do site — ${selectedProject.title}`}
+                      decoding="async"
+                      draggable={false}
+                      className="w-full h-auto block select-none"
+                    />
+                  </div>
+                  {/* Metric strip */}
+                  <div className="flex items-center justify-between gap-3 px-5 py-3.5 bg-black/85 border-t border-purple-500/20 shrink-0">
+                    <div className="flex flex-col">
+                      <span className="text-xl sm:text-2xl font-black text-purple-300 leading-none">
+                        {selectedProject.stats.metric}
+                      </span>
+                      <span className="text-[8px] font-bold text-white/70 uppercase tracking-wider mt-1">
+                        {selectedProject.stats.label}
+                      </span>
+                    </div>
+                    <span className="flex items-center gap-1.5 text-[8px] font-black text-emerald-300 uppercase tracking-widest">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                      </span>
+                      No ar
+                    </span>
+                  </div>
+                </div>
+              ) : (
               <div className="w-full md:w-1/2 relative min-h-[200px] md:min-h-full bg-black flex flex-col justify-end">
                 <div className={`absolute inset-0 bg-gradient-to-br ${selectedProject.fallbackGradient} opacity-30`} />
                 <img
@@ -1405,7 +1609,7 @@ export default function App() {
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                
+
                 {/* Metric Badge */}
                 <div className="relative z-10 p-8 sm:p-10">
                   <div className="inline-flex flex-col bg-purple-950/80 border border-purple-500/30 backdrop-blur-md rounded-2xl p-4 shadow-lg">
@@ -1418,6 +1622,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
+              )}
 
               {/* Right Column: Details */}
               <div className="w-full md:w-1/2 p-8 sm:p-10 flex flex-col justify-between bg-gradient-to-b from-transparent to-black/20">
@@ -1453,8 +1658,18 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* CTA Action */}
-                <div className="mt-8 pt-6 border-t border-white/5">
+                {/* CTA Actions */}
+                <div className="mt-8 pt-6 border-t border-white/5 flex flex-col gap-3">
+                  {selectedProject.liveUrl && (
+                    <a
+                      href={selectedProject.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full flex items-center justify-center gap-2 text-xs font-black text-purple-200 border border-purple-500/40 hover:border-purple-400 hover:bg-purple-500/10 rounded-full py-3.5 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer uppercase tracking-wider text-center"
+                    >
+                      Visitar Site ao Vivo <ExternalLink className="w-3.5 h-3.5" strokeWidth={2.5} />
+                    </a>
+                  )}
                   <a
                     href={`https://wa.me/5573991422872?text=Olá! Vi o case de sucesso "${selectedProject.title}" no portfólio da Sidarta e gostaria de solicitar um orçamento para um projeto semelhante.`}
                     target="_blank"
