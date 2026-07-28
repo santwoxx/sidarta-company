@@ -78,7 +78,7 @@ const PORTFOLIO_PROJECTS: PortfolioItem[] = [
     category: 'Cliente • Centro Automotivo',
     shortDescription: 'Plataforma oficial da Central Auto Center apresentando serviços automotivos completos, agendamentos e localização de unidades.',
     description: 'Portal corporativo desenvolvido para a Central Auto Center. Focado em autoridade da marca, captação de clientes, apresentação detalhada de serviços mecânicos, alinhamento 3D e facilidade de agendamento com funil direto via WhatsApp.',
-    image: '/central-autocar-preview.jpg',
+    image: '/central-autocenter-preview.jpg',
     fallbackGradient: 'from-indigo-900 via-purple-950 to-black',
     techs: ['React', 'Vite', 'Tailwind CSS', 'SEO Local', 'WhatsApp Funnel'],
     stats: {
@@ -93,7 +93,7 @@ const PORTFOLIO_PROJECTS: PortfolioItem[] = [
     category: 'Cliente • Catálogo Digital',
     shortDescription: 'Site especializado na exibição de catálogo de pneus, marcas premium, troca de pneus e orçamento express via WhatsApp.',
     description: 'Solução digital de alta performance desenvolvida para a Central Pneus. Permite que os clientes visualizem marcas, modelos de pneus por aro, serviços de troca e solicitem orçamento imediato diretamente no WhatsApp.',
-    image: '/central-autocar-preview.jpg',
+    image: '/central-pneus-preview.jpg',
     fallbackGradient: 'from-purple-900 via-indigo-950 to-black',
     techs: ['React', 'Vite', 'Tailwind CSS', 'Vercel', 'UI/UX Otimizado'],
     stats: {
@@ -108,7 +108,7 @@ const PORTFOLIO_PROJECTS: PortfolioItem[] = [
     category: 'Cliente • Site Corporativo',
     shortDescription: 'Site corporativo de alto impacto visual para a WA Fort, focado em autoridade de mercado, apresentação de soluções e geração de novos leads.',
     description: 'Website institucional desenvolvido sob medida para a WA Fort. Unindo estética moderna, velocidade de carregamento, responsividade e posicionamento estratégico para converter visitantes em clientes qualificados.',
-    image: '/central-autocar-preview.jpg',
+    image: '/wafort-preview.jpg',
     fallbackGradient: 'from-purple-950 via-slate-900 to-black',
     techs: ['React', 'TypeScript', 'Tailwind CSS', 'SEO Otimizado', 'Branding'],
     stats: {
@@ -1329,21 +1329,36 @@ export default function App() {
                     >
                       <div className="absolute -inset-20 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.14)_0%,transparent_65%)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-                      <div className="relative z-10">
-                        <div className="flex items-center justify-between gap-2 mb-3">
-                          <span className="text-[8px] sm:text-[9px] font-extrabold text-purple-300 bg-purple-950/70 border border-purple-500/35 rounded-md px-2 py-0.5 uppercase tracking-wider">
+                      {/* Card Top Preview Screenshot Header */}
+                      <div className="relative h-32 sm:h-36 -mx-5 -mt-5 sm:-mx-6 sm:-mt-6 mb-4 overflow-hidden border-b border-purple-500/20 bg-[#0b1220]">
+                        <img
+                          src={project.image}
+                          alt={`Prévia do site ${project.title}`}
+                          decoding="async"
+                          className="w-full h-full object-cover object-top opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0516] via-[#0a0516]/40 to-transparent" />
+                        
+                        <div className="absolute top-3 left-3 z-10">
+                          <span className="text-[8px] sm:text-[9px] font-extrabold text-purple-300 bg-black/80 border border-purple-500/40 rounded-md px-2.5 py-1 uppercase tracking-wider backdrop-blur-md shadow-md">
                             {project.category}
                           </span>
-                          {project.liveUrl && (
-                            <span className="flex items-center gap-1.5 text-[8px] font-black text-emerald-300 uppercase tracking-widest bg-emerald-950/50 border border-emerald-500/40 px-2 py-0.5 rounded-full">
+                        </div>
+
+                        {project.liveUrl && (
+                          <div className="absolute top-3 right-3 z-10">
+                            <span className="flex items-center gap-1.5 text-[8px] font-black text-emerald-300 uppercase tracking-widest bg-black/80 border border-emerald-500/40 px-2.5 py-1 rounded-full backdrop-blur-md shadow-md">
                               <span className="relative flex h-1.5 w-1.5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
                               </span>
                               Ao vivo
                             </span>
-                          )}
-                        </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="relative z-10">
 
                         <h4 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight mb-2 group-hover:text-purple-300 transition-colors">
                           {project.title}
