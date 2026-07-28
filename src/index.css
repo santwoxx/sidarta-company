@@ -14,7 +14,7 @@ html {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    background-color: #000;
+    background-color: #0c0f0a; /* dark almost black */
     color: #fff;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -22,310 +22,30 @@ html {
   }
 }
 
-/* Cyber grid background */
-.cyber-grid {
-  background-image: 
-    linear-gradient(rgba(139, 92, 246, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.07) 1px, transparent 1px);
-  background-size: 50px 50px;
+/* Diagonal cut for the hero section */
+.clip-diagonal {
+  clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.clip-diagonal-left {
+  clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+}
+
+/* Green dots particle background */
+.bg-particles {
+  background-image: radial-gradient(#4ADE80 1px, transparent 1px);
+  background-size: 80px 80px;
   background-position: center;
-  mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
+  opacity: 0.15;
 }
 
-/* Pulsing background aurora glow */
-@keyframes pulse-glow {
-  0%, 100% { 
-    opacity: 0.35; 
-    transform: scale(1) translate(-50%, -50%); 
-  }
-  50% { 
-    opacity: 0.6; 
-    transform: scale(1.15) translate(-45%, -45%); 
-  }
+/* Floating animation */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }
 
-.aurora-glow {
-  filter: blur(120px);
-  animation: pulse-glow 10s infinite ease-in-out;
-  will-change: transform, opacity;
-}
-
-/* Scanline effect for the 3D figurine box */
-.scanline {
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 0) 50%,
-    rgba(255, 255, 255, 0.08) 50%,
-    rgba(255, 255, 255, 0.08)
-  );
-  background-size: 100% 4px;
-}
-
-.will-change-transform-filter-opacity {
-  will-change: transform, filter, opacity;
-}
-
-/* Custom Scrollbar for Portfolio section */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.35);
-  border-radius: 10px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.65);
-}
-
-/* Entrance fade-in-up with blur keyframe */
-@keyframes slide-up-fade {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-    filter: blur(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-.animate-fade-in-up {
-  animation: slide-up-fade 1.0s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Shifting gradient text keyframes */
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-.gradient-text-animated {
-  background: linear-gradient(90deg, #c084fc 0%, #6366f1 50%, #ec4899 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: gradient-shift 4s ease infinite;
-}
-
-/* ===== Space / Universe backdrop (Portfolio) — purple & black ===== */
-
-/* Tiled star fields; three layers with different densities, drift speeds and twinkle rhythms */
-.space-stars {
-  position: absolute;
-  inset: -60px 0 0 0;
-  background-repeat: repeat;
-  background-image:
-    radial-gradient(1px 1px at 22px 34px, rgba(255, 255, 255, 0.85) 50%, transparent 100%),
-    radial-gradient(1px 1px at 118px 156px, rgba(216, 180, 254, 0.65) 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 196px 74px, rgba(255, 255, 255, 0.55) 50%, transparent 100%),
-    radial-gradient(1px 1px at 64px 220px, rgba(196, 181, 253, 0.5) 50%, transparent 100%),
-    radial-gradient(1px 1px at 254px 190px, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
-  background-size: 290px 290px;
-  animation: star-twinkle 6s ease-in-out infinite, star-drift 90s linear infinite alternate;
-  will-change: transform, opacity;
-}
-
-.space-stars-2 {
-  background-image:
-    radial-gradient(1px 1px at 48px 96px, rgba(255, 255, 255, 0.55) 50%, transparent 100%),
-    radial-gradient(2px 2px at 168px 44px, rgba(233, 213, 255, 0.7) 50%, transparent 100%),
-    radial-gradient(1px 1px at 300px 200px, rgba(255, 255, 255, 0.4) 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 240px 320px, rgba(192, 132, 252, 0.55) 50%, transparent 100%);
-  background-size: 400px 400px;
-  animation-duration: 8s, 130s;
-  animation-delay: 1.5s, 0s;
-}
-
-.space-stars-3 {
-  background-image:
-    radial-gradient(2.5px 2.5px at 120px 120px, rgba(255, 255, 255, 0.9) 40%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 340px 260px, rgba(192, 132, 252, 0.75) 50%, transparent 100%),
-    radial-gradient(2px 2px at 480px 80px, rgba(255, 255, 255, 0.5) 50%, transparent 100%),
-    radial-gradient(2px 2px at 220px 440px, rgba(165, 180, 252, 0.6) 50%, transparent 100%);
-  background-size: 580px 580px;
-  animation-duration: 11s, 180s;
-  animation-delay: 3s, 0s;
-}
-
-@keyframes star-twinkle {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
-}
-
-@keyframes star-drift {
-  from { transform: translateY(0); }
-  to { transform: translateY(50px); }
-}
-
-/* Soft nebulas drifting through the void (sized/positioned inline per instance) */
-.nebula {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(80px);
-  mix-blend-mode: screen;
-  pointer-events: none;
-  will-change: transform;
-}
-
-@keyframes nebula-drift-a {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(60px, -45px) scale(1.15); }
-}
-
-@keyframes nebula-drift-b {
-  0%, 100% { transform: translate(0, 0) scale(1.08); }
-  50% { transform: translate(-70px, 50px) scale(0.94); }
-}
-
-/* Occasional shooting stars streaking down-left */
-.shooting-star {
-  position: absolute;
-  width: 150px;
-  height: 1.5px;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(192, 132, 252, 0.5), transparent);
-  box-shadow: 0 0 6px rgba(216, 180, 254, 0.6);
-  opacity: 0;
-  transform: rotate(215deg);
-  animation: shooting 11s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes shooting {
-  0%, 76% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(215deg);
-  }
-  78% {
-    opacity: 1;
-  }
-  86%, 100% {
-    opacity: 0;
-    transform: translate3d(-420px, 300px, 0) rotate(215deg);
-  }
-}
-
-/* ===== Featured live-preview (Portfolio) — 3D float & glow ===== */
-
-/* Slow levitation of the whole browser frame */
-@keyframes levitate {
-  0%, 100% {
-    transform: translateY(0) rotateX(0.35deg) rotateZ(-0.15deg);
-  }
-  50% {
-    transform: translateY(-12px) rotateX(-0.5deg) rotateZ(0.15deg);
-  }
-}
-
-.animate-levitate {
-  animation: levitate 7s ease-in-out infinite;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-
-/* Floating badges orbiting the frame at different 3D depths (--z) */
-@keyframes badge-float {
-  0%, 100% {
-    transform: translateY(0) translateZ(var(--z, 60px));
-  }
-  50% {
-    transform: translateY(-9px) translateZ(var(--z, 60px));
-  }
-}
-
-.float-badge {
-  animation: badge-float 5.5s ease-in-out infinite;
-  will-change: transform;
-}
-
-/* Breathing glow projected under the levitating frame */
-@keyframes glow-breathe {
-  0%, 100% {
-    opacity: 0.45;
-    transform: translateX(-50%) scaleX(0.9);
-  }
-  50% {
-    opacity: 0.85;
-    transform: translateX(-50%) scaleX(1.05);
-  }
-}
-
-.featured-glow {
-  position: absolute;
-  left: 50%;
-  bottom: -40px;
-  width: 78%;
-  height: 70px;
-  border-radius: 9999px;
-  background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.4) 0%, rgba(59, 130, 246, 0.18) 45%, transparent 72%);
-  filter: blur(28px);
-  animation: glow-breathe 7s ease-in-out infinite;
-  pointer-events: none;
-}
-
-/* Full-page site capture that slowly pans down while hovered and snaps back on leave */
-.site-preview-scroll {
-  display: block;
-  transform: translateY(0);
-  transition: transform 1.2s ease;
-  will-change: transform;
-}
-
-.group:hover .site-preview-scroll {
-  transform: translateY(calc(-100% + var(--frame-h, 460px)));
-  transition: transform 7s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-/* Diagonal shine sweep across the live preview on hover */
-@keyframes shine-sweep {
-  from {
-    transform: translateX(-160%) skewX(-18deg);
-  }
-  to {
-    transform: translateX(340%) skewX(-18deg);
-  }
-}
-
-.shine-layer {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 34%;
-  background: linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0.09) 50%, transparent 100%);
-  transform: translateX(-160%) skewX(-18deg);
-  pointer-events: none;
-}
-
-.group:hover > div > .shine-layer,
-.group:hover .shine-layer {
-  animation: shine-sweep 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Respect users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .animate-levitate,
-  .float-badge,
-  .featured-glow,
-  .shine-layer,
-  .space-stars,
-  .nebula,
-  .shooting-star {
-    animation: none !important;
-  }
-  .site-preview-scroll {
-    transition: none !important;
-    transform: none !important;
-  }
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
