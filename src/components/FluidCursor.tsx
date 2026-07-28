@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ColorRGB {
   r: number;
@@ -38,9 +38,9 @@ export function FluidCursor({
   dyeResolution = 1024,
   densityDissipation = 3.5,
   velocityDissipation = 2,
-  pressure = 0.1,
+  pressure: pressureProp = 0.1,
   pressureIterations = 20,
-  curl = 3,
+  curl: curlProp = 3,
   splatRadius = 0.25,
   splatForce = 6000,
   shading = true,
@@ -49,8 +49,9 @@ export function FluidCursor({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvEl = canvasRef.current;
+    if (!canvEl) return;
+    const canv: HTMLCanvasElement = canvEl;
 
     let animFrameId: number;
     let isCleanedUp = false;
@@ -62,9 +63,9 @@ export function FluidCursor({
       CAPTURE_RESOLUTION: 512,
       DENSITY_DISSIPATION: densityDissipation,
       VELOCITY_DISSIPATION: velocityDissipation,
-      PRESSURE: pressure,
+      PRESSURE: pressureProp,
       PRESSURE_ITERATIONS: pressureIterations,
-      CURL: curl,
+      CURL: curlProp,
       SPLAT_RADIUS: splatRadius,
       SPLAT_FORCE: splatForce,
       SHADING: shading,
@@ -92,7 +93,7 @@ export function FluidCursor({
     const pointers: Pointer[] = [pointerPrototype()];
 
     // Get WebGL Context
-    function getWebGLContext(canv: HTMLCanvasElement) {
+    function getWebGLContext(canvasEl: HTMLCanvasElement) {
       const params = {
         alpha: true,
         depth: false,
@@ -101,10 +102,10 @@ export function FluidCursor({
         preserveDrawingBuffer: false,
       };
 
-      let gl = canv.getContext('webgl2', params) as WebGL2RenderingContext | null;
+      let gl = canvasEl.getContext('webgl2', params) as WebGL2RenderingContext | null;
       if (!gl) {
-        gl = (canv.getContext('webgl', params) ||
-          canv.getContext('experimental-webgl', params)) as WebGL2RenderingContext | null;
+        gl = (canvasEl.getContext('webgl', params) ||
+          canvasEl.getContext('experimental-webgl', params)) as WebGL2RenderingContext | null;
       }
 
       if (!gl) return null;
@@ -200,7 +201,7 @@ export function FluidCursor({
       };
     }
 
-    const contextData = getWebGLContext(canvas);
+    const contextData = getWebGLContext(canv);
     if (!contextData) return;
     const { gl, ext } = contextData;
 
@@ -830,15 +831,13 @@ export function FluidCursor({
 
     // PURPLE / ROXO COLOR GENERATOR FOR ELECTRIC NEON FLUID
     function generatePurpleColor(): ColorRGB {
-      // Purple / Violet HSV range: Hue between 0.72 (260° Indigo/Purple) and 0.82 (295° Magenta/Violet)
       const h = 0.72 + Math.random() * 0.10;
       const s = 0.85 + Math.random() * 0.15;
       const v = 0.95;
       const c = HSVtoRGB(h, s, v);
 
-      // Boost purple channel luminescence for glowing trail
       c.r = Math.min(1.0, c.r * 1.3 + 0.1);
-      c.g = c.g * 0.35; // keep green low for pure vibrant purple
+      c.g = c.g * 0.35;
       c.b = Math.min(1.0, c.b * 1.4 + 0.15);
       return c;
     }
@@ -888,11 +887,11 @@ export function FluidCursor({
     }
 
     function resizeCanvas() {
-      const width = scaleByPixelRatio(canvas.clientWidth);
-      const height = scaleByPixelRatio(canvas.clientHeight);
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
+      const width = scaleByPixelRatio(canv.clientWidth);
+      const height = scaleByPixelRatio(canv.clientHeight);
+      if (canv.width !== width || canv.height !== height) {
+        canv.width = width;
+        canv.height = height;
         return true;
       }
       return false;
@@ -1053,7 +1052,7 @@ export function FluidCursor({
       if (splatProgram.uniforms.uTarget)
         gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read.attach(0));
       if (splatProgram.uniforms.aspectRatio)
-        gl.uniform1f(splatProgram.uniforms.aspectRatio, canvas.width / canvas.height);
+        gl.uniform1f(splatProgram.uniforms.aspectRatio, canv.width / canv.height);
       if (splatProgram.uniforms.point)
         gl.uniform2f(splatProgram.uniforms.point, x, y);
       if (splatProgram.uniforms.color)
@@ -1072,7 +1071,7 @@ export function FluidCursor({
     }
 
     function correctRadius(radius: number) {
-      const aspectRatio = canvas.width / canvas.height;
+      const aspectRatio = canv.width / canv.height;
       if (aspectRatio > 1) radius *= aspectRatio;
       return radius;
     }
@@ -1081,8 +1080,8 @@ export function FluidCursor({
       pointer.id = id;
       pointer.down = true;
       pointer.moved = false;
-      pointer.texcoordX = posX / canvas.width;
-      pointer.texcoordY = 1 - posY / canvas.height;
+      pointer.texcoordX = posX / canv.width;
+      pointer.texcoordY = 1 - posY / canv.height;
       pointer.prevTexcoordX = pointer.texcoordX;
       pointer.prevTexcoordY = pointer.texcoordY;
       pointer.deltaX = 0;
@@ -1093,8 +1092,8 @@ export function FluidCursor({
     function updatePointerMoveData(pointer: Pointer, posX: number, posY: number, color: ColorRGB) {
       pointer.prevTexcoordX = pointer.texcoordX;
       pointer.prevTexcoordY = pointer.texcoordY;
-      pointer.texcoordX = posX / canvas.width;
-      pointer.texcoordY = 1 - posY / canvas.height;
+      pointer.texcoordX = posX / canv.width;
+      pointer.texcoordY = 1 - posY / canv.height;
       pointer.deltaX = correctDeltaX(pointer.texcoordX - pointer.prevTexcoordX);
       pointer.deltaY = correctDeltaY(pointer.texcoordY - pointer.prevTexcoordY);
       pointer.moved = Math.abs(pointer.deltaX) > 0 || Math.abs(pointer.deltaY) > 0;
@@ -1102,13 +1101,13 @@ export function FluidCursor({
     }
 
     function correctDeltaX(delta: number) {
-      const aspectRatio = canvas.width / canvas.height;
+      const aspectRatio = canv.width / canv.height;
       if (aspectRatio < 1) delta *= aspectRatio;
       return delta;
     }
 
     function correctDeltaY(delta: number) {
-      const aspectRatio = canvas.width / canvas.height;
+      const aspectRatio = canv.width / canv.height;
       if (aspectRatio > 1) delta /= aspectRatio;
       return delta;
     }
@@ -1170,7 +1169,7 @@ export function FluidCursor({
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [simResolution, dyeResolution, densityDissipation, velocityDissipation, pressure, pressureIterations, curl, splatRadius, splatForce, shading, colorUpdateSpeed]);
+  }, [simResolution, dyeResolution, densityDissipation, velocityDissipation, pressureProp, pressureIterations, curlProp, splatRadius, splatForce, shading, colorUpdateSpeed]);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[58] w-full h-full overflow-hidden">

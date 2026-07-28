@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp, X, ExternalLink, Lock, Menu, MessageCircle, ChevronRight, Check, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowDown, ArrowUp, X, ExternalLink, Lock, Menu, MessageCircle, ChevronRight, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FluidCursor } from './components/FluidCursor';
 
@@ -456,7 +456,7 @@ export default function App() {
     const video = videoRef.current;
     if (!video) return;
 
-    let animationFrameId: number;
+    let animationFrameId: number | undefined;
     let targetTime = 0;
     let isSeeking = false;
     const isMobileDevice = window.innerWidth < 1024;
