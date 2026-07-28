@@ -55,22 +55,71 @@ interface PortfolioItem {
   liveUrl?: string;
 }
 
-// Real client project featured with a live preview at the top of the Portfolio section
-const FEATURED_PROJECT: PortfolioItem = {
-  id: 'centralautocar',
-  title: 'Central AutoCar',
-  category: 'Cliente • Site Institucional',
-  shortDescription: 'Site institucional de alta conversão para o centro automotivo referência em Itabuna/BA — com agendamento direto via WhatsApp e SEO local.',
-  description: 'Site institucional desenvolvido para a Central AutoCar, centro automotivo com 4 filiais na Bahia. O projeto apresenta a vitrine completa de serviços (alinhamento 3D, mecânica geral e pneus), unidades, depoimentos e FAQ, com funil de agendamento direto via WhatsApp, carregamento instantâneo e SEO local otimizado para dominar as buscas da região.',
-  image: '/central-autocar-preview.jpg',
-  fallbackGradient: 'from-blue-900 via-slate-950 to-black',
-  techs: ['React', 'Vite', 'Tailwind CSS', 'Vercel', 'SEO Local'],
-  stats: {
-    metric: '5.0 ★',
-    label: 'Avaliação dos clientes no Google'
+// Client projects featured in the Portfolio section
+const PORTFOLIO_PROJECTS: PortfolioItem[] = [
+  {
+    id: 'centralautocar',
+    title: 'Central AutoCar',
+    category: 'Cliente • Site Institucional',
+    shortDescription: 'Site institucional de alta conversão para o centro automotivo referência em Itabuna/BA — com agendamento direto via WhatsApp e SEO local.',
+    description: 'Site institucional desenvolvido para a Central AutoCar, centro automotivo com 4 filiais na Bahia. O projeto apresenta a vitrine completa de serviços (alinhamento 3D, mecânica geral e pneus), unidades, depoimentos e FAQ, com funil de agendamento direto via WhatsApp, carregamento instantâneo e SEO local otimizado para dominar as buscas da região.',
+    image: '/central-autocar-preview.jpg',
+    fallbackGradient: 'from-blue-900 via-slate-950 to-black',
+    techs: ['React', 'Vite', 'Tailwind CSS', 'Vercel', 'SEO Local'],
+    stats: {
+      metric: '5.0 ★',
+      label: 'Avaliação dos clientes no Google'
+    },
+    liveUrl: 'https://central-autocar-site.vercel.app/'
   },
-  liveUrl: 'https://central-autocar-site.vercel.app/'
-};
+  {
+    id: 'centralautocenter',
+    title: 'Central Auto Center',
+    category: 'Cliente • Centro Automotivo',
+    shortDescription: 'Plataforma oficial da Central Auto Center apresentando serviços automotivos completos, agendamentos e localização de unidades.',
+    description: 'Portal corporativo desenvolvido para a Central Auto Center. Focado em autoridade da marca, captação de clientes, apresentação detalhada de serviços mecânicos, alinhamento 3D e facilidade de agendamento com funil direto via WhatsApp.',
+    image: '/central-autocar-preview.jpg',
+    fallbackGradient: 'from-indigo-900 via-purple-950 to-black',
+    techs: ['React', 'Vite', 'Tailwind CSS', 'SEO Local', 'WhatsApp Funnel'],
+    stats: {
+      metric: '+4 Filiais',
+      label: 'Atendimento na Região'
+    },
+    liveUrl: 'https://www.centralautocenter.com.br'
+  },
+  {
+    id: 'centralpneus',
+    title: 'Central Pneus',
+    category: 'Cliente • Catálogo Digital',
+    shortDescription: 'Site especializado na exibição de catálogo de pneus, marcas premium, troca de pneus e orçamento express via WhatsApp.',
+    description: 'Solução digital de alta performance desenvolvida para a Central Pneus. Permite que os clientes visualizem marcas, modelos de pneus por aro, serviços de troca e solicitem orçamento imediato diretamente no WhatsApp.',
+    image: '/central-autocar-preview.jpg',
+    fallbackGradient: 'from-purple-900 via-indigo-950 to-black',
+    techs: ['React', 'Vite', 'Tailwind CSS', 'Vercel', 'UI/UX Otimizado'],
+    stats: {
+      metric: '100%',
+      label: 'Otimizado para Mobile'
+    },
+    liveUrl: 'https://central-pneus-site.vercel.app'
+  },
+  {
+    id: 'wafort',
+    title: 'WA Fort',
+    category: 'Cliente • Site Corporativo',
+    shortDescription: 'Site corporativo de alto impacto visual para a WA Fort, focado em autoridade de mercado, apresentação de soluções e geração de novos leads.',
+    description: 'Website institucional desenvolvido sob medida para a WA Fort. Unindo estética moderna, velocidade de carregamento, responsividade e posicionamento estratégico para converter visitantes em clientes qualificados.',
+    image: '/central-autocar-preview.jpg',
+    fallbackGradient: 'from-purple-950 via-slate-900 to-black',
+    techs: ['React', 'TypeScript', 'Tailwind CSS', 'SEO Otimizado', 'Branding'],
+    stats: {
+      metric: 'Alta Performance',
+      label: 'Carregamento Ultra-rápido'
+    },
+    liveUrl: 'https://wafort.com.br'
+  }
+];
+
+const FEATURED_PROJECT = PORTFOLIO_PROJECTS[0];
 
 interface MagneticButtonProps {
   onClick: () => void;
@@ -1253,6 +1302,94 @@ export default function App() {
                 </div>
 
                 <div className="featured-glow" />
+              </div>
+
+              {/* Portfolio Projects Grid */}
+              <div 
+                className={`mt-4 sm:mt-6 mb-8 transition-all duration-1000 ${
+                  activeSection === 'portfolio' ? 'animate-fade-in-up' : 'opacity-0'
+                }`}
+                style={{ animationDelay: '0.45s', animationFillMode: 'forwards' }}
+              >
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="w-6 h-px bg-purple-500/50" />
+                  <h3 className="text-xs sm:text-sm font-black text-purple-300 uppercase tracking-[0.25em]">
+                    Mais Cases de Sucesso
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+                  {PORTFOLIO_PROJECTS.slice(1).map((project) => (
+                    <motion.div
+                      key={project.id}
+                      whileHover={{ y: -6, scale: 1.01 }}
+                      transition={{ duration: 0.2 }}
+                      onClick={() => setSelectedProject(project)}
+                      className="group relative rounded-2xl border border-purple-500/25 bg-[#0a0516]/85 p-5 sm:p-6 backdrop-blur-xl hover:border-purple-500/60 transition-all cursor-pointer flex flex-col justify-between shadow-xl shadow-black/70 hover:shadow-purple-950/40 overflow-hidden"
+                    >
+                      <div className="absolute -inset-20 bg-[radial-gradient(circle_at_center,rgba(168,85,247,0.14)_0%,transparent_65%)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between gap-2 mb-3">
+                          <span className="text-[8px] sm:text-[9px] font-extrabold text-purple-300 bg-purple-950/70 border border-purple-500/35 rounded-md px-2 py-0.5 uppercase tracking-wider">
+                            {project.category}
+                          </span>
+                          {project.liveUrl && (
+                            <span className="flex items-center gap-1.5 text-[8px] font-black text-emerald-300 uppercase tracking-widest bg-emerald-950/50 border border-emerald-500/40 px-2 py-0.5 rounded-full">
+                              <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                              </span>
+                              Ao vivo
+                            </span>
+                          )}
+                        </div>
+
+                        <h4 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight mb-2 group-hover:text-purple-300 transition-colors">
+                          {project.title}
+                        </h4>
+
+                        <p className="text-xs text-white/70 font-medium leading-relaxed mb-4 line-clamp-3">
+                          {project.shortDescription}
+                        </p>
+
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          {project.techs.map((tech) => (
+                            <span
+                              key={tech}
+                              className="text-[8px] font-bold bg-white/5 border border-white/10 text-purple-200/90 rounded-md px-2 py-0.5 uppercase tracking-wider"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-black text-purple-300 leading-none">
+                            {project.stats.metric}
+                          </span>
+                          <span className="text-[8px] font-bold text-white/60 uppercase tracking-wider mt-0.5">
+                            {project.stats.label}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-purple-600/80 hover:bg-purple-500 text-[8px] font-black text-white uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-purple-950/40"
+                          >
+                            Visitar <ExternalLink className="w-2.5 h-2.5" strokeWidth={3} />
+                          </a>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           </div>
