@@ -78,7 +78,7 @@ const PORTFOLIO_PROJECTS: PortfolioItem[] = [
     category: 'Cliente • Centro Automotivo',
     shortDescription: 'Plataforma oficial da Central Auto Center apresentando serviços automotivos completos, agendamentos e localização de unidades.',
     description: 'Portal corporativo desenvolvido para a Central Auto Center. Focado em autoridade da marca, captação de clientes, apresentação detalhada de serviços mecânicos, alinhamento 3D e facilidade de agendamento com funil direto via WhatsApp.',
-    image: '/central-autocenter-preview.jpg',
+    image: '/central autocenter.jpeg',
     fallbackGradient: 'from-indigo-900 via-purple-950 to-black',
     techs: ['React', 'Vite', 'Tailwind CSS', 'SEO Local', 'WhatsApp Funnel'],
     stats: {
@@ -93,7 +93,7 @@ const PORTFOLIO_PROJECTS: PortfolioItem[] = [
     category: 'Cliente • Catálogo Digital',
     shortDescription: 'Site especializado na exibição de catálogo de pneus, marcas premium, troca de pneus e orçamento express via WhatsApp.',
     description: 'Solução digital de alta performance desenvolvida para a Central Pneus. Permite que os clientes visualizem marcas, modelos de pneus por aro, serviços de troca e solicitem orçamento imediato diretamente no WhatsApp.',
-    image: '/central-pneus-preview.jpg',
+    image: '/central pneus.jpeg',
     fallbackGradient: 'from-purple-900 via-indigo-950 to-black',
     techs: ['React', 'Vite', 'Tailwind CSS', 'Vercel', 'UI/UX Otimizado'],
     stats: {
@@ -108,7 +108,7 @@ const PORTFOLIO_PROJECTS: PortfolioItem[] = [
     category: 'Cliente • Site Corporativo',
     shortDescription: 'Site corporativo de alto impacto visual para a WA Fort, focado em autoridade de mercado, apresentação de soluções e geração de novos leads.',
     description: 'Website institucional desenvolvido sob medida para a WA Fort. Unindo estética moderna, velocidade de carregamento, responsividade e posicionamento estratégico para converter visitantes em clientes qualificados.',
-    image: '/wafort-preview.jpg',
+    image: '/wafort.jpeg',
     fallbackGradient: 'from-purple-950 via-slate-900 to-black',
     techs: ['React', 'TypeScript', 'Tailwind CSS', 'SEO Otimizado', 'Branding'],
     stats: {
