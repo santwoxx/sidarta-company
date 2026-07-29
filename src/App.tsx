@@ -1816,7 +1816,7 @@ export default function App() {
                       alt={`Prévia do site — ${selectedProject.title}`}
                       decoding="async"
                       draggable={false}
-                      className="w-full h-auto block select-none"
+                      className="w-full h-full object-cover object-top block select-none"
                     />
                   </div>
                   <div className="flex items-center justify-between gap-3 px-4 py-3 bg-black/90 border-t border-purple-500/20 shrink-0">
